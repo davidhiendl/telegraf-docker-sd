@@ -1,7 +1,20 @@
 # Telegraf Docker Service Discovery
 
+## Description
+Instead of configuring every service/container manually you build
+templates that are matched against containers and build the telegraf
+input configurations dynamically. This allows for great flexibility and
+the ability to monitor docker containers that are created dynamically by
+orchestration frameworks like Swarm, K8Ns, ...
+
 ## Template data struct
 `TODO`  add full description of all variables & methods available to the struct (basically everything in `Params` struct
+
+## Pre-configured templates
+others must be configured manually (pull requests welcome)
+- MySQL
+- NGINX
+- PHP-FPM
 
 ## Configuration Variables
 | Variable             | Default                     | Description                                                                                 |
