@@ -59,7 +59,7 @@ It is the templates responsibility to determine if the container matches the tem
 - Any container labels starting with `telegraf.sd.config.*` will be shortened by this prefix and added to the config map.
 
 ### Swarm labels
-If `TSD_TAG_SWARM_LABELS` is set to true then any of these labels are also added to the list of tags.
+If `TSD_TAG_SWARM_LABELS` is set to true then all of these labels are also added to the list of tags.
 - com.docker.stack.namespace
 - com.docker.swarm.node.id
 - com.docker.swarm.service.id
