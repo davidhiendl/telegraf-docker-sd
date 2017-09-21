@@ -34,7 +34,7 @@ const (
 )
 
 const (
-	CONFIG_DEFAULT_QUERY_INTERVAL = 10
+	CONFIG_DEFAULT_QUERY_INTERVAL = 15
 )
 
 var DefaultConfig = Config{
