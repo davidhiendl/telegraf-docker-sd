@@ -71,5 +71,11 @@ These variables contain all available data about the container itself. Shortcut 
   urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
            {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
 
+  # add automatically discovered tags
+  [inputs.nginx.tags]
+  {{ range $key, $value := .Tags }}
+  {{ $key }} = "{{ $value }}"
+  {{ end }}
+
 {{end}}
 ```
