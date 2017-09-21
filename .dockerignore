@@ -1,0 +1,7 @@
+# ignore .git, IDE and build directories
+**/.git/
+**/.idea/
+**/.iml
+
+# ignore build state dirs
+/pkg/

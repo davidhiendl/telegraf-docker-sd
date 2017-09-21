@@ -1,0 +1,4 @@
+**/.idea/
+*.iml
+/conf.test.d/sd-container_*.conf
+/pkg/
