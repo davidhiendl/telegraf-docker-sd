@@ -31,7 +31,7 @@ func (params *Params) ConfigOrDefault(key string, def string) string {
 	}
 }
 
-func (params *Params) GetConfig(key string) string {
+func (params *Params) ConfigGet(key string) string {
 	value, ok := params.Config[key];
 	if ok {
 		return value
@@ -40,7 +40,7 @@ func (params *Params) GetConfig(key string) string {
 	}
 }
 
-func (params *Params) HasConfig(key string, def string) bool {
+func (params *Params) ConfigHas(key string, def string) bool {
 	_, ok := params.Config[key];
 	return ok
 }

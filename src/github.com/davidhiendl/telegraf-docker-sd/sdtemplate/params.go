@@ -30,3 +30,7 @@ func NewParams(container types.Container) (*Params) {
 func (params *Params) BridgeIP() string {
 	return params.Bridge.IPAddress
 }
+
+func (params *Params) Labels() map[string]string {
+	return params.Container.Labels
+}

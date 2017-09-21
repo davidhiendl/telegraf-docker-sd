@@ -17,7 +17,7 @@ func (params *Params) MatchImageRegex(pattern string) bool {
 
 // Look for an exact match of the image but ignore the tag
 func (params *Params) MatchImage(pattern string) bool {
-	match, err := regexp.MatchString("^"+pattern+":.*$", params.Container.Image)
+	match, err := regexp.MatchString("^"+regexp.QuoteMeta(pattern)+":.*$", params.Container.Image)
 
 	if err != nil {
 		panic(err)
@@ -31,7 +31,7 @@ func (params *Params) LabelExists(label string) bool {
 	return ok
 }
 
-func (params *Params) LabelExistsAllOf(labels []string) bool {
+func (params *Params) LabelExistsAllOf(labels ...string) bool {
 	for _, label := range labels {
 		if _, exists := params.Container.Labels[label]; !exists {
 			return false
@@ -41,7 +41,7 @@ func (params *Params) LabelExistsAllOf(labels []string) bool {
 	return true
 }
 
-func (params *Params) LabelExistsAnyOf(labels []string) bool {
+func (params *Params) LabelExistsAnyOf(labels ...string) bool {
 	for _, label := range labels {
 		if _, exists := params.Container.Labels[label]; exists {
 			return true
