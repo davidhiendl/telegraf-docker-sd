@@ -10,15 +10,17 @@ type Params struct {
 	Bridge    *network.EndpointSettings
 	Tags      map[string]string
 	Config    map[string]string
+	Image     *types.ImageSummary
 }
 
 // Create new config and populate it from environment
-func NewParams(container types.Container) (*Params) {
+func NewParams(container types.Container, image *types.ImageSummary) (*Params) {
 	params := Params{
 		Container: container,
 		Bridge:    container.NetworkSettings.Networks["bridge"],
 		Tags:      make(map[string]string),
 		Config:    make(map[string]string),
+		Image:     image,
 	}
 
 	params.parseLabelsAsConfig()

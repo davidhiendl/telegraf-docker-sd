@@ -8,7 +8,6 @@ import (
 	"log"
 	"io/ioutil"
 	"regexp"
-	"strings"
 	"github.com/davidhiendl/telegraf-docker-sd/sdtemplate"
 	"bytes"
 	"time"
@@ -37,21 +36,6 @@ func NewApp(config *Config, cli *client.Client, ctx context.Context) (*App) {
 	app.processConfig()
 	app.loadTemplates()
 	return &app
-}
-
-func (app *App) processConfig() {
-	app.processConfigLabelsAsTags()
-}
-
-func (app *App) processConfigLabelsAsTags() {
-	labelsRaw := strings.Split(app.config.TagsFromLabels, ",")
-
-	labelsClean := []string{}
-	for _, label := range labelsRaw {
-		labelsClean = append(labelsClean, label)
-	}
-
-	app.tagsFromLabels = labelsClean
 }
 
 func (app *App) Watch() {
@@ -184,11 +168,6 @@ func (app *App) ProcessContainers() (error) {
 	return nil
 }
 
-func (app *App) cleanupTrackedContainer(tracked *TrackedContainer) {
-	tracked.RemoveConfigFile()
-	delete(app.trackedContainers, tracked.containerID)
-	app.shouldReload = true
-}
 
 func (app *App) ProcessContainer(cont types.Container) {
 
@@ -216,7 +195,8 @@ func (app *App) ProcessContainer(cont types.Container) {
 	}
 
 	// assemble template params
-	params := sdtemplate.NewParams(cont)
+	image := app.getImageForID(cont.ImageID)
+	params := sdtemplate.NewParams(cont, image)
 
 	// add swarm labels if desired
 	if app.config.TagsFromSwarmLabels {
@@ -237,6 +217,8 @@ func (app *App) ProcessContainer(cont types.Container) {
 	// mark as changed
 	app.shouldReload = true
 }
+
+
 
 func (app *App) processTemplatesAgainstContainer(params *sdtemplate.Params) string {
 	buf := new(bytes.Buffer)

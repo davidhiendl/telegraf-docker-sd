@@ -2,28 +2,32 @@ package sdtemplate
 
 import (
 	"regexp"
+	"fmt"
 )
 
 // execute a custom regex pattern against the container image name
 func (params *Params) MatchImageRegex(pattern string) bool {
-	match, err := regexp.MatchString(pattern, params.Container.Image)
-
+	expr, err := regexp.Compile(pattern)
+	fmt.Printf("pattern: %v image: %v", pattern, params.Image.RepoTags)
 	if err != nil {
 		panic(err)
 	}
 
-	return match
+	// match against each tag
+	for _, tag := range params.Image.RepoTags {
+		if expr.MatchString(tag) {
+			fmt.Printf(" matched \n")
+			return true
+		}
+	}
+	fmt.Printf(" no match \n")
+
+	return false
 }
 
 // Look for an exact match of the image but ignore the tag
 func (params *Params) MatchImage(pattern string) bool {
-	match, err := regexp.MatchString("^"+regexp.QuoteMeta(pattern)+":.*$", params.Container.Image)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return match
+	return params.MatchImageRegex("^" + regexp.QuoteMeta(pattern) + ":.*$")
 }
 
 func (params *Params) LabelExists(label string) bool {
