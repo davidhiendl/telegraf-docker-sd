@@ -26,9 +26,13 @@ func NewTrackedContainer(app *App, containerID string, params *sdtemplate.Params
 
 func (tc *TrackedContainer) GetConfigFile() string {
 	if tc.configFile == "" {
-		tc.configFile = tc.app.config.ConfigDir + "/" + tc.app.config.AutoConfPrefix + tc.containerID + tc.app.config.AutoConfExtension
+		tc.configFile = tc.app.config.ConfigDir + "/" + tc.app.config.AutoConfPrefix + tc.GetShortID() + tc.app.config.AutoConfExtension
 	}
 	return tc.configFile
+}
+
+func (tc *TrackedContainer) GetShortID() string {
+	return tc.containerID[0:12]
 }
 
 func (tc *TrackedContainer) RemoveConfigFile() {
