@@ -1,3 +1,4 @@
+{{ if .MatchImage "mysql" }}
 
 # Read metrics from one or many mysql servers
 [[inputs.mysql]]
@@ -65,3 +66,10 @@
   # ssl_ca = "/etc/telegraf/ca.pem"
   # ssl_cert = "/etc/telegraf/cert.pem"
   # ssl_key = "/etc/telegraf/key.pem"
+
+  [inputs.nginx.tags]
+  {{ range $key, $value := .Tags }}
+  {{ $key }} = "{{ $value }}"
+  {{ end }}
+
+{{ end }}

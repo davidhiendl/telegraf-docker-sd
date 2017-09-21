@@ -1,4 +1,4 @@
-{{- if .MatchImage "nginx" }}
+{{ if .MatchImage "nginx" }}
 
 # Read Nginx's basic status information (ngx_http_stub_status_module)
 [[inputs.nginx]]
@@ -15,4 +15,10 @@
   # HTTP response timeout (default: 5s)
   response_timeout = "5s"
 
-{{end}}
+  # add automatically discovered tags
+  [inputs.nginx.tags]
+  {{ range $key, $value := .Tags }}
+  {{ $key }} = "{{ $value }}"
+  {{ end }}
+
+{{ end }}
