@@ -4,7 +4,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/api/types"
 	"golang.org/x/net/context"
-	"fmt"
 	"log"
 	"io/ioutil"
 	"regexp"
@@ -12,6 +11,7 @@ import (
 	"bytes"
 	"time"
 	"os"
+	"syscall"
 )
 
 type App struct {
@@ -22,6 +22,7 @@ type App struct {
 	templates         map[string]*sdtemplate.Template
 	trackedContainers map[string]*TrackedContainer
 	shouldReload      bool
+	signalDispatcher  []*SignalDispatcher
 }
 
 // Create new config and populate it from environment
@@ -33,11 +34,17 @@ func NewApp(config *Config, cli *client.Client, ctx context.Context) (*App) {
 		trackedContainers: make(map[string]*TrackedContainer),
 		shouldReload:      false,
 	}
+
 	app.processConfig()
 	app.loadTemplates()
+
+	// register telegraf reload handler
+	app.signalDispatcher = append(app.signalDispatcher, NewSignalHandler("telegraf", syscall.SIGHUP))
+
 	return &app
 }
 
+// periodically execute Run
 func (app *App) Watch() {
 	raw := app.config.QueryInterval
 	if raw <= 0 {
@@ -46,7 +53,7 @@ func (app *App) Watch() {
 
 	interval := time.Duration(raw) * time.Second
 
-	fmt.Printf("polling for changes every: %v \n", interval)
+	// fmt.Printf("polling for changes every: %v \n", interval)
 
 	for {
 		app.Run()
@@ -54,17 +61,22 @@ func (app *App) Watch() {
 	}
 }
 
+// run templates against containers and generate config
 func (app *App) Run() {
 	app.ProcessContainers()
 	if app.shouldReload {
-		app.TriggerTelegrafReload()
+		app.Reload()
 	}
 }
 
-func (app *App) TriggerTelegrafReload() {
-	fmt.Println("reloading telegraf configuration")
-	// TODO impl telegraf update
-	// scan for telegraf processes and send sighup
+// reloads all registered agents
+func (app *App) Reload() {
+	// fmt.Println("reloading configuration")
+
+	for _, sh := range app.signalDispatcher {
+		sh.Execute()
+	}
+
 	app.shouldReload = false
 }
 
@@ -85,7 +97,7 @@ func (app *App) ClearConfigFiles() {
 
 	for _, f := range files {
 		if rex.MatchString(f.Name()) {
-			fmt.Printf("cleaning up file: %v\n", f.Name())
+			// fmt.Printf("cleaning up file: %v\n", f.Name())
 			path := app.config.ConfigDir + "/" + f.Name()
 
 			stat, err := os.Stat(path)
@@ -95,7 +107,7 @@ func (app *App) ClearConfigFiles() {
 
 			// do not touch anything that is not a file
 			if stat.IsDir() {
-				fmt.Printf("ERROR: Config file is directory: %v \n", path)
+				// fmt.Printf("ERROR: Config file is directory: %v \n", path)
 				continue
 			}
 
@@ -121,13 +133,12 @@ func (app *App) loadTemplates() {
 	for _, f := range files {
 		matches := rex.FindAllStringSubmatch(f.Name(), -1)
 		if matches == nil {
-			fmt.Println("skipped: " + f.Name())
 			continue
 		}
 
 		name := matches[0][1]
 		filePath := app.config.TemplateDir + "/" + f.Name()
-		fmt.Printf("loading config template: %v from %v \n", name, filePath)
+		// fmt.Printf("loading config template: %v from %v \n", name, filePath)
 
 		tpl, err := sdtemplate.NewTemplate(name, filePath)
 		if err != nil {
@@ -160,14 +171,13 @@ func (app *App) ProcessContainers() (error) {
 		}
 
 		if !found {
-			fmt.Printf("cleaning up no longer tracked container: \n", id)
+			// fmt.Printf("cleaning up no longer tracked container: \n", id)
 			app.cleanupTrackedContainer(tracked)
 		}
 	}
 
 	return nil
 }
-
 
 func (app *App) ProcessContainer(cont types.Container) {
 
@@ -190,7 +200,7 @@ func (app *App) ProcessContainer(cont types.Container) {
 	// check if bridge network exists
 	_, ok := cont.NetworkSettings.Networks["bridge"]
 	if !ok {
-		fmt.Printf("%v[%v] missing network bridge on container, skipped \n", cont.ID, cont.Names[0])
+		// fmt.Printf("%v[%v] missing network bridge on container, skipped \n", cont.ID, cont.Names[0])
 		return
 	}
 
@@ -217,8 +227,6 @@ func (app *App) ProcessContainer(cont types.Container) {
 	// mark as changed
 	app.shouldReload = true
 }
-
-
 
 func (app *App) processTemplatesAgainstContainer(params *sdtemplate.Params) string {
 	buf := new(bytes.Buffer)

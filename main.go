@@ -42,7 +42,7 @@ func main() {
 
 	case os.Args[0] == "clear":
 		instance.ClearConfigFiles()
-		instance.TriggerTelegrafReload()
+		instance.Reload()
 
 	default:
 		instance.ClearConfigFiles()

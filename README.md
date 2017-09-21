@@ -1,14 +1,23 @@
 # Telegraf Docker Service Discovery
 
 ## Description
-Instead of configuring every service/container manually you build
-templates that are matched against containers and build the telegraf
-input configurations dynamically. This allows for great flexibility and
+`telegraf-docker-sd` is a companion for the
+[github.com/influxdata/telegraf](https://github.com/influxdata/telegraf)
+agent with the goal to support flexible configuration in order to detect
+and monitor services running inside docker containers without the need
+to manually configure the required inputs.
+
+Instead of configuring every service/container the configuration is
+generated via templates that are matched against containers to build
+the configuration dynamically. This allows for great flexibility and
 the ability to monitor docker containers that are created dynamically by
 orchestration frameworks like Swarm, K8Ns, ...
 
 ## Example configuration
-[Full Configuration Guide](doc/TEMPLATE.md)
+[Full Template Documentation](doc/TEMPLATE.md) \
+By using GO Templates an enormous amount of flexibility can be achieved
+when creating templates. See the full documentation for a list of
+available methods and variables as well as examples.
 ```
 {{- if .MatchImage "nginx" }}
 
@@ -16,6 +25,12 @@ orchestration frameworks like Swarm, K8Ns, ...
 [[inputs.nginx]]
   urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
            {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
+
+  # add automatically discovered tags
+  [inputs.nginx.tags]
+  {{ range $key, $value := .Tags }}
+  {{ $key }} = "{{ $value }}"
+  {{ end }}
 
 {{end}}
 ```
@@ -52,8 +67,3 @@ If `TSD_TAG_SWARM_LABELS` is set to true then any of these labels are also added
 - com.docker.swarm.task
 - com.docker.swarm.task.id
 - com.docker.swarm.task.name
-
-## References
-- [Telegraf Issue: Cannot peronalize tags on inputs per-plugin instance](https://github.com/influxdata/telegraf/issues/662)
-- [GO Template Reference](https://golang.org/pkg/text/template/)
-
