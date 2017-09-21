@@ -8,6 +8,7 @@ the ability to monitor docker containers that are created dynamically by
 orchestration frameworks like Swarm, K8Ns, ...
 
 ## Example configuration
+[Full Configuration Guide](doc/TEMPLATE.md)
 ```
 {{- if .MatchImage "nginx" }}
 
@@ -32,7 +33,7 @@ others must be configured manually (pull requests welcome)
 | TSD_CONFIG_DIR       | /etc/telegraf/conf.d        | Where configurations are written to, the telegraf config directory                          |
 | TSD_TAG_SWARM_LABELS | true                        | If docker swarm labels should be imported as tags. See `Container Detection > Swarm Labels` |
 | TSD_TAG_LABELS       | none                        | A list of comma separated labels that should be added as tags                               |
-| TSD_QUERY_INTERVAL   | 10                          | Interval in seconds between querying of the docker api for changes                          |
+| TSD_QUERY_INTERVAL   | 15                          | Interval in seconds between querying of the docker api for changes                          |
 
 ## Container Detection
 The discovery routine automatically scans the docker host for all of it's running containers and applies each template against the container.

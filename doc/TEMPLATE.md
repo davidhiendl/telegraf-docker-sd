@@ -23,8 +23,9 @@ These variables contain all available data about the container itself. Shortcut 
 
 | Name       | Type     | Params | Return                   | Description                  |
 | ---        | ---      | ---    | ---                      | ---                          |
-| .Bridge    | Variable | none   | network.EndpointSettings | docker api endpoint settings |
 | .Container | Variable | none   | types.Container          | docker api container         |
+| .Bridge    | Variable | none   | network.EndpointSettings | docker api endpoint settings |
+| .Image     | Variable | none   | types.ImageSummary       | docker api image             |
 
 ## Examples
 **Filter by image:**
@@ -57,6 +58,7 @@ These variables contain all available data about the container itself. Shortcut 
 [[inputs.nginx]]
   urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
            {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
+
 {{end}}
 ```
 
@@ -68,5 +70,6 @@ These variables contain all available data about the container itself. Shortcut 
 [[inputs.nginx]]
   urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
            {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
+
 {{end}}
 ```
