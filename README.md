@@ -7,8 +7,17 @@ input configurations dynamically. This allows for great flexibility and
 the ability to monitor docker containers that are created dynamically by
 orchestration frameworks like Swarm, K8Ns, ...
 
-## Template data struct
-`TODO`  add full description of all variables & methods available to the struct (basically everything in `Params` struct
+## Example configuration
+```
+{{- if .MatchImage "nginx" }}
+
+# Read Nginx's basic status information (ngx_http_stub_status_module)
+[[inputs.nginx]]
+  urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
+           {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
+
+{{end}}
+```
 
 ## Pre-configured templates
 others must be configured manually (pull requests welcome)
