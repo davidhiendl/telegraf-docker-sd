@@ -8,10 +8,8 @@ RUN		apt-get update \
 &&		apt-get install -y upx
 
 # add sources (add manually instead of entire dir to speed up build time for non-code changes)
-ADD		main.go		/go/src/github.com/davidhiendl/telegraf-docker-sd
+ADD		main.go		/go/src/github.com/davidhiendl/telegraf-docker-sd/
 ADD		app			/go/src/github.com/davidhiendl/telegraf-docker-sd/app
-ADD		sdtemplate	/go/src/github.com/davidhiendl/telegraf-docker-sd/sdtemplate
-ADD		logger		/go/src/github.com/davidhiendl/telegraf-docker-sd/logger
 
 # fetch remaining dependencies and build package
 RUN		go get . \
