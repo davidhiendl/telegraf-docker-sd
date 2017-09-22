@@ -2,6 +2,9 @@ package app
 
 import (
 	"github.com/kelseyhightower/envconfig"
+	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"path/filepath"
+	"strconv"
 )
 
 type Config struct {
@@ -26,14 +29,6 @@ var SWARM_LABELS = []string{
 }
 
 const (
-	LOG_NONE  = 1 << iota
-	LOG_ERROR = 1 << iota
-	LOG_WARN  = 1 << iota
-	LOG_INFO  = 1 << iota
-	LOG_DEBUG = 1 << iota
-)
-
-const (
 	CONFIG_DEFAULT_QUERY_INTERVAL = 15
 )
 
@@ -42,7 +37,7 @@ var DefaultConfig = Config{
 	ConfigDir:           "/etc/telegraf/telegraf.d",
 	AutoConfPrefix:      "sd-container_",
 	AutoConfExtension:   ".conf",
-	LogLevel:            LOG_WARN,
+	LogLevel:            logger.LOG_WARN,
 	TagsFromSwarmLabels: true,
 	TagsFromLabels:      "",
 	QueryInterval:       CONFIG_DEFAULT_QUERY_INTERVAL,
@@ -54,7 +49,24 @@ func NewConfig() (*Config) {
 	return &c
 }
 
+func (c *Config) AsMap() (map[string]string) {
+	m := make(map[string]string)
+
+	m["TemplateDir"] = c.TemplateDir
+	m["TemplateDir"] = c.ConfigDir
+	m["AutoConfPrefix"] = c.AutoConfPrefix
+	m["AutoConfExtension"] = c.AutoConfExtension
+	m["LogLevel"] = strconv.Itoa(c.LogLevel)
+	m["TagsFromSwarmLabels"] = strconv.FormatBool(c.TagsFromSwarmLabels)
+	m["TagsFromLabels"] = c.TagsFromLabels
+	m["QueryInterval"] = strconv.Itoa(c.QueryInterval)
+
+	return m
+}
+
 func (c *Config) LoadFromEnv() error {
 	err := envconfig.Process("TSD", c)
+	c.TemplateDir, _ = filepath.Abs(c.TemplateDir)
+	c.ConfigDir, _ = filepath.Abs(c.ConfigDir)
 	return err;
 }

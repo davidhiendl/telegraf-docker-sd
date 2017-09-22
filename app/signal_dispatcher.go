@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 	"strconv"
-	"fmt"
 	"io"
 	"syscall"
 	"path/filepath"
+	"github.com/davidhiendl/telegraf-docker-sd/logger"
 )
 
 type SignalDispatcher struct {
@@ -35,7 +35,6 @@ func (sigdp *SignalDispatcher) Execute() {
 		// are interested in. Run as root (sudo) and log the error, in case you want
 		// this information.
 		if err != nil {
-			// log.Println(err)
 			return nil
 		}
 
@@ -46,7 +45,7 @@ func (sigdp *SignalDispatcher) Execute() {
 			// convert the <pid> into an integer. Log an error if it fails.
 			pid, err := strconv.Atoi(path[6:strings.LastIndex(path, "/")])
 			if err != nil {
-				log.Println(err)
+				logger.Debugf("failed to extract pid from path: %v", path)
 				return nil
 			}
 
@@ -63,9 +62,10 @@ func (sigdp *SignalDispatcher) Execute() {
 			name := string(f[6:bytes.IndexByte(f, '\n')])
 
 			if name == sigdp.Name {
-				fmt.Printf("PID: %d, Name: %s will be signaled with %v.\n", pid, name, sigdp.Signal)
+				logger.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, sigdp.Signal)
 				proc, err := os.FindProcess(pid)
 				if err != nil {
+				logger.Errorf("> Failed to signal, err: %v", err)
 					log.Println(err)
 				}
 

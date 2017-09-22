@@ -11,6 +11,7 @@ RUN		apt-get update \
 ADD		main.go		/go/src/github.com/davidhiendl/telegraf-docker-sd
 ADD		app			/go/src/github.com/davidhiendl/telegraf-docker-sd/app
 ADD		sdtemplate	/go/src/github.com/davidhiendl/telegraf-docker-sd/sdtemplate
+ADD		logger		/go/src/github.com/davidhiendl/telegraf-docker-sd/logger
 
 # fetch remaining dependencies and build package
 RUN		go get . \
@@ -20,7 +21,7 @@ RUN		go get . \
 			./main.go \
 
 # compress binary
-&&		upx --brute /telegraf-docker-sd
+&&		upx /telegraf-docker-sd
 
 # build container next
 FROM    phusion/baseimage:0.9.22

@@ -21,7 +21,7 @@ build-compressed:
 	&& echo $$GOPATH \
 	&& go get . \
 	&& go build -i -ldflags="-s -w" -o $(binary-path)/compressed/$(binary-name) ./main.go \
-	&& upx --brute $(binary-path)/compressed/$(binary-name)
+	&& upx $(binary-path)/compressed/$(binary-name)
 
 # build image
 image:

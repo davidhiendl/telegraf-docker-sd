@@ -3,7 +3,8 @@ package app
 import (
 	"github.com/davidhiendl/telegraf-docker-sd/sdtemplate"
 	"os"
-	"fmt"
+	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"path/filepath"
 )
 
 // TrackedContainer is used to maintain state about already processed containers and to be able to remove their configurations easily
@@ -26,7 +27,8 @@ func NewTrackedContainer(app *App, containerID string, params *sdtemplate.Params
 
 func (tc *TrackedContainer) GetConfigFile() string {
 	if tc.configFile == "" {
-		tc.configFile = tc.app.config.ConfigDir + "/" + tc.app.config.AutoConfPrefix + tc.GetShortID() + tc.app.config.AutoConfExtension
+		file, _ := filepath.Abs(tc.app.config.ConfigDir + "/" + tc.app.config.AutoConfPrefix + tc.GetShortID() + tc.app.config.AutoConfExtension)
+		tc.configFile = file
 	}
 	return tc.configFile
 }
@@ -43,13 +45,13 @@ func (tc *TrackedContainer) RemoveConfigFile() {
 
 	// do not touch anything that is not a file
 	if stat.IsDir() {
-		fmt.Printf("ERROR: Config file is directory: %v \n", tc.GetConfigFile())
+		logger.Errorf("Config file is directory: %v \n", tc.GetConfigFile())
 		return
 	}
 
 	err = os.Remove(tc.GetConfigFile())
 	if err != nil {
-		panic(err)
+		logger.Errorf("Failed to remove config file: %v with err: %v", tc.GetConfigFile(), err)
 	}
 }
 

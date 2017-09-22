@@ -12,6 +12,7 @@ import (
 	"time"
 	"os"
 	"syscall"
+	"github.com/davidhiendl/telegraf-docker-sd/logger"
 )
 
 type App struct {
@@ -52,8 +53,6 @@ func (app *App) Watch() {
 	}
 
 	interval := time.Duration(raw) * time.Second
-
-	// fmt.Printf("polling for changes every: %v \n", interval)
 
 	for {
 		app.Run()
@@ -97,7 +96,7 @@ func (app *App) ClearConfigFiles() {
 
 	for _, f := range files {
 		if rex.MatchString(f.Name()) {
-			// fmt.Printf("cleaning up file: %v\n", f.Name())
+			logger.Debugf("cleaning up file: %v", f.Name())
 			path := app.config.ConfigDir + "/" + f.Name()
 
 			stat, err := os.Stat(path)
@@ -107,7 +106,7 @@ func (app *App) ClearConfigFiles() {
 
 			// do not touch anything that is not a file
 			if stat.IsDir() {
-				// fmt.Printf("ERROR: Config file is directory: %v \n", path)
+				logger.Debugf("Config file is directory: %v", path)
 				continue
 			}
 
@@ -138,7 +137,7 @@ func (app *App) loadTemplates() {
 
 		name := matches[0][1]
 		filePath := app.config.TemplateDir + "/" + f.Name()
-		// fmt.Printf("loading config template: %v from %v \n", name, filePath)
+		logger.Infof("loading config template: %v from %v", name, filePath)
 
 		tpl, err := sdtemplate.NewTemplate(name, filePath)
 		if err != nil {
@@ -149,10 +148,11 @@ func (app *App) loadTemplates() {
 
 }
 
-func (app *App) ProcessContainers() (error) {
+func (app *App) ProcessContainers() {
 	containers, err := app.docker.ContainerList(app.ctx, types.ContainerListOptions{});
 	if err != nil {
-		return err
+		logger.Warnf("failed to process container: %v", err)
+		return
 	}
 
 	// check existing containers and configure them
@@ -164,19 +164,19 @@ func (app *App) ProcessContainers() (error) {
 	for id, tracked := range app.trackedContainers {
 		found := false
 
+		// check if it still exists
 		for _, cont := range containers {
 			if cont.ID == id {
 				found = true
 			}
 		}
 
+		// if it does not exist anymore then remove the associated config
 		if !found {
-			// fmt.Printf("cleaning up no longer tracked container: \n", id)
+			logger.Debugf("cleaning up no longer tracked container: %v", id)
 			app.cleanupTrackedContainer(tracked)
 		}
 	}
-
-	return nil
 }
 
 func (app *App) ProcessContainer(cont types.Container) {
@@ -200,7 +200,7 @@ func (app *App) ProcessContainer(cont types.Container) {
 	// check if bridge network exists
 	_, ok := cont.NetworkSettings.Networks["bridge"]
 	if !ok {
-		// fmt.Printf("%v[%v] missing network bridge on container, skipped \n", cont.ID, cont.Names[0])
+		logger.Debugf("%v: missing network bridge on container, skipping", cont.Names[0])
 		return
 	}
 
@@ -213,8 +213,8 @@ func (app *App) ProcessContainer(cont types.Container) {
 		params.ParseLabelsAsTags(SWARM_LABELS)
 	}
 
-	// fmt.Printf("- detected tags: %+v \n", params.Tags)
-	// fmt.Printf("- detected config: %+v \n", params.Config)
+	logger.Debugf("%v: detected tags: %+v", cont.Names[0], params.Tags)
+	logger.Debugf("%v: detected config: %+v", cont.Names[0], params.Config)
 
 	// register tracked container
 	tracked := NewTrackedContainer(app, cont.ID, params)
