@@ -17,6 +17,8 @@ func main() {
 		logger.Fatalf("failed to parse configuration from environment: %v \n", err)
 	}
 
+	logger.SetLevel(config.LogLevel)
+
 	// print config
 	m := config.AsMap()
 	for key, value := range m {

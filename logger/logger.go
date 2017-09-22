@@ -7,15 +7,15 @@ import (
 	"strings"
 )
 
-var logLevel = LOG_INFO
+var maxLevel = LOG_INFO
 var timeZone = time.Now().Format("Z07:00")
 
 const (
-	LOG_NONE  = 1 << iota
-	LOG_ERROR = 1 << iota
-	LOG_WARN  = 1 << iota
-	LOG_INFO  = 1 << iota
-	LOG_DEBUG = 1 << iota
+	LOG_NONE  = 0
+	LOG_ERROR = iota
+	LOG_WARN  = iota
+	LOG_INFO  = iota
+	LOG_DEBUG = iota
 )
 
 const shorter_nano = "2006-01-02T15:04:05.9999"
@@ -38,11 +38,11 @@ func LevelAsString(level int) string {
 }
 
 func SetLevel(level int) {
-	logLevel = level
+	maxLevel = level
 }
 
 func log(level int, format string, a []interface{}) (n int, err error) {
-	if (level < logLevel) {
+	if level > maxLevel {
 		return 0, nil
 	}
 

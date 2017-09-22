@@ -37,7 +37,7 @@ var DefaultConfig = Config{
 	ConfigDir:           "/etc/telegraf/telegraf.d",
 	AutoConfPrefix:      "sd-container_",
 	AutoConfExtension:   ".conf",
-	LogLevel:            logger.LOG_WARN,
+	LogLevel:            logger.LOG_INFO,
 	TagsFromSwarmLabels: true,
 	TagsFromLabels:      "",
 	QueryInterval:       CONFIG_DEFAULT_QUERY_INTERVAL,
