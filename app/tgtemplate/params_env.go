@@ -1,4 +1,5 @@
-package sdtemplate
+package tgtemplate
+
 
 func (params *Params) EnvOrDefault(key string, def string) string {
 	value, ok := params.EnvMap[key];

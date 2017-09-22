@@ -13,6 +13,7 @@ import (
 	"os"
 	"syscall"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/tgtemplate"
 )
 
 type App struct {
@@ -21,6 +22,7 @@ type App struct {
 	docker            *client.Client
 	ctx               context.Context
 	templates         map[string]*sdtemplate.Template
+	telegrafTemplate  *tgtemplate.Template
 	trackedContainers map[string]*TrackedContainer
 	shouldReload      bool
 	signalDispatcher  []*SignalDispatcher
@@ -38,6 +40,7 @@ func NewApp(config *Config, cli *client.Client, ctx context.Context) (*App) {
 
 	app.processConfig()
 	app.loadTemplates()
+	app.processMainTemplateFile()
 
 	// register telegraf reload handler
 	app.signalDispatcher = append(app.signalDispatcher, NewSignalHandler("telegraf", syscall.SIGHUP))
@@ -118,36 +121,6 @@ func (app *App) ClearConfigFiles() {
 	}
 }
 
-// Load templates from disk. If called multiple times templates are re-loaded
-func (app *App) loadTemplates() {
-	app.templates = make(map[string]*sdtemplate.Template)
-
-	files, err := ioutil.ReadDir(app.config.TemplateDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// check all files and extract simple name without extension
-	rex, _ := regexp.Compile("(^[a-zA-Z0-9_\\.\\-]*)\\.goconf$")
-	for _, f := range files {
-		matches := rex.FindAllStringSubmatch(f.Name(), -1)
-		if matches == nil {
-			continue
-		}
-
-		name := matches[0][1]
-		filePath := app.config.TemplateDir + "/" + f.Name()
-		logger.Infof("loading config template: %v from %v", name, filePath)
-
-		tpl, err := sdtemplate.NewTemplate(name, filePath)
-		if err != nil {
-			panic(err)
-		}
-		app.templates[name] = tpl
-	}
-
-}
-
 func (app *App) ProcessContainers() {
 	containers, err := app.docker.ContainerList(app.ctx, types.ContainerListOptions{});
 	if err != nil {
@@ -221,21 +194,17 @@ func (app *App) ProcessContainer(cont types.Container) {
 	app.trackedContainers[cont.ID] = tracked
 
 	// process template(s) for container
-	confStr := app.processTemplatesAgainstContainer(params)
-	tracked.WriteConfigFile(confStr)
-
-	// mark as changed
-	app.shouldReload = true
-}
-
-func (app *App) processTemplatesAgainstContainer(params *sdtemplate.Params) string {
-	buf := new(bytes.Buffer)
+	configBuffer := new(bytes.Buffer)
 	for _, template := range app.templates {
-		err := template.Execute(params, buf)
+		err := template.Execute(params, configBuffer)
 		if err != nil {
 			panic(err)
 		}
 	}
 
-	return buf.String()
+	// write config
+	tracked.WriteConfigFile(configBuffer.String())
+
+	// mark as changed
+	app.shouldReload = true
 }

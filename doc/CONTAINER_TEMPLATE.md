@@ -16,6 +16,10 @@
 | .BridgeIP         | Function | none                       | string              | The actual container bridge ip                               |
 | .Tags             | Variable | none                       | map\[string\]string | A map of all computed tags and values                        |
 | .Labels           | Function | none                       | map\[string\]string | A map of all labels and their values                         |
+| .EnvOrDefault     | Function | label string, value string | string              | Get a environment variable or the default                    |
+| .EnvGet           | Function | label string               | string              | Get a environment variable                                   |
+| .EnvHas           | Function | label string               | bool                | Check if a environment variable exists                       |
+| .EnvEquals        | Function | label string, value string | bool                | Check if a environment variables equals a given value        |
 
 
 ## Raw variables

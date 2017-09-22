@@ -14,10 +14,25 @@ the ability to monitor docker containers that are created dynamically by
 orchestration frameworks like Swarm, K8Ns, ...
 
 ## Example configuration
-[Full Template Documentation](doc/TEMPLATE.md) \
 By using GO Templates an enormous amount of flexibility can be achieved
-when creating templates. See the full documentation for a list of
+when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
+
+**[Main Template Documentation](doc/MAIN_TEMPLATE.md)**\
+File: `_template.goconf`
+```
+...
+# Global tags can be specified here in key="value" format.
+[global_tags]
+  # import all environment variables with format "GLOBAL_TAGS_$key=$value" as tags
+  {{ range $key, $value := .GlobalTagsFromEnv }}
+  {{ $key }} = "{{ $value }}"
+{{ end }}
+...
+```
+
+**[Full Template Documentation](doc/CONTAINER_TEMPLATE.md)** \
+File: `nginx.goconf`
 ```
 {{- if .MatchImage "nginx" }}
 
