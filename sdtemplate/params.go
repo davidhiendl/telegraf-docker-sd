@@ -3,6 +3,8 @@ package sdtemplate
 import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
+	"os"
+	"strings"
 )
 
 type Params struct {
@@ -11,6 +13,7 @@ type Params struct {
 	Tags      map[string]string
 	Config    map[string]string
 	Image     *types.ImageSummary
+	EnvMap map[string]string
 }
 
 // Create new config and populate it from environment
@@ -21,6 +24,13 @@ func NewParams(container types.Container, image *types.ImageSummary) (*Params) {
 		Tags:      make(map[string]string),
 		Config:    make(map[string]string),
 		Image:     image,
+		EnvMap: make(map[string]string),
+	}
+
+	// convert environment to map
+	for _, e := range os.Environ() {
+		pair := strings.SplitN(e, "=", 2)
+		params.EnvMap[pair[0]] = pair[1]
 	}
 
 	params.parseLabelsAsConfig()
