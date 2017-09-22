@@ -19,7 +19,7 @@ when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
 
 **[Main Template Documentation](doc/MAIN_TEMPLATE.md)**\
-File: `_template.goconf`
+File: [_template.goconf](sd-tpl.d/_template.goconf)
 ```
 ...
 # Global tags can be specified here in key="value" format.
@@ -32,7 +32,7 @@ File: `_template.goconf`
 ```
 
 **[Full Template Documentation](doc/CONTAINER_TEMPLATE.md)** \
-File: `nginx.goconf`
+File: [nginx.goconf](sd-tpl.d/nginx.goconf)
 ```
 {{- if .MatchImage "nginx" }}
 
@@ -79,7 +79,7 @@ docker run -ti \
 ```
 
 **Building the image yourself:**\
-The entire build (including building the binary) is included in the [Dockerfile](./Dockerfile).
+The entire build (including building the binary) is included in the [Dockerfile](Dockerfile).
 ```bash
 docker build -t yourprefix/telegraf-docker-sd:<tag>
 ```
