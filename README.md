@@ -19,7 +19,7 @@ when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
 
 **[Main Template Documentation](doc/MAIN_TEMPLATE.md)**\
-File: [_template.goconf](sd-tpl.d/_template.goconf)
+File: [_telegraf.goconf](sd-tpl.d/_telegraf.goconf)
 ```
 ...
 # Global tags can be specified here in key="value" format.
