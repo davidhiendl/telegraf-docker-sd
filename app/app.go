@@ -7,12 +7,12 @@ import (
 	"log"
 	"io/ioutil"
 	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/sdtemplate"
+	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
 	"bytes"
 	"time"
 	"os"
 	"syscall"
-	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )
 
 type App struct {

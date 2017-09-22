@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"path/filepath"
 	"strconv"
 )

@@ -10,7 +10,7 @@ import (
 	"io"
 	"syscall"
 	"path/filepath"
-	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )
 
 type SignalDispatcher struct {

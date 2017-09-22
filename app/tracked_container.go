@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/davidhiendl/telegraf-docker-sd/sdtemplate"
+	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
 	"os"
-	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"path/filepath"
 )
 

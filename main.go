@@ -5,7 +5,7 @@ import (
 	"golang.org/x/net/context"
 	"os"
 	"github.com/davidhiendl/telegraf-docker-sd/app"
-	"github.com/davidhiendl/telegraf-docker-sd/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )
 
 func main() {
