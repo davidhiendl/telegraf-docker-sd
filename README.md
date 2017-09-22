@@ -1,7 +1,7 @@
 # Telegraf Docker Service Discovery
 
 ## Description
-`telegraf-docker-sd` is a companion for the
+`telegraf-docker-sd` is a lightweight (written in GO) companion for the
 [github.com/influxdata/telegraf](https://github.com/influxdata/telegraf)
 agent with the goal to support flexible configuration in order to detect
 and monitor services running inside docker containers without the need
@@ -35,20 +35,48 @@ available methods and variables as well as examples.
 {{end}}
 ```
 
+## Ideas / New template methods / Issues / ... ?
+Feel free to send me a PR or open an issue. I'm open for suggestions / improvements.
+
+**Want to add custom template methods?** \
+Just add new Receivers to the [sdtemplate.Params](sdtemplate/params.go) struct
+```go
+func (params *Params) YourCustomTemplateMethod(arg1 string, arg2 string, <<whatever>>) string {
+    // do something useful
+    return "somevalue"
+}
+```
+
 ## Pre-configured templates
 others must be configured manually (pull requests welcome)
 - MySQL
 - NGINX
 - PHP-FPM
 
+## Docker Image
+**Using pre-built image:**
+```bash
+docker run -ti \
+    -v "$(PWD)/sd-tpl.d":/etc/telegraf/sd-tpl.d \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -e TSD_TAG_LABELS="my.custom.label.a,some.other.label.to.use.as.tags,..." \
+    dhswt/telegraf-docker-sd:stable
+```
+
+**Building the image yourself:**\
+The entire build (including building the binary) is included in the [Dockerfile](./Dockerfile).
+```bash
+docker build -t yourprefix/telegraf-docker-sd:<tag>
+```
+
 ## Configuration Variables
-| Variable             | Default                     | Description                                                                                 |
-| ---                  | ---                         | ---                                                                                         |
-| TSD_TEMPLATE_DIR     | /etc/telegraf/conf.sd-tpl.d | Where configurations templates are taken from                                               |
-| TSD_CONFIG_DIR       | /etc/telegraf/conf.d        | Where configurations are written to, the telegraf config directory                          |
-| TSD_TAG_SWARM_LABELS | true                        | If docker swarm labels should be imported as tags. See `Container Detection > Swarm Labels` |
-| TSD_TAG_LABELS       | none                        | A list of comma separated labels that should be added as tags                               |
-| TSD_QUERY_INTERVAL   | 15                          | Interval in seconds between querying of the docker api for changes                          |
+| Variable             | Default                  | Description                                                                                 |
+| ---                  | ---                      | ---                                                                                         |
+| TSD_TEMPLATE_DIR     | /etc/telegraf/sd-tpl.d   | Where configurations templates are taken from                                               |
+| TSD_CONFIG_DIR       | /etc/telegraf/telegraf.d | Where configurations are written to, the telegraf config directory                          |
+| TSD_TAG_SWARM_LABELS | true                     | If docker swarm labels should be imported as tags. See `Container Detection > Swarm Labels` |
+| TSD_TAG_LABELS       | none                     | A list of comma separated labels that should be added as tags                               |
+| TSD_QUERY_INTERVAL   | 15                       | Interval in seconds between querying of the docker api for changes                          |
 
 ## Container Detection
 The discovery routine automatically scans the docker host for all of it's running containers and applies each template against the container.
@@ -67,3 +95,6 @@ If `TSD_TAG_SWARM_LABELS` is set to true then all of these labels are also added
 - com.docker.swarm.task
 - com.docker.swarm.task.id
 - com.docker.swarm.task.name
+
+## Build dependencies
+- GO >= 1.8 (should work with 1.7, untested)

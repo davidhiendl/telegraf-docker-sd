@@ -38,8 +38,8 @@ const (
 )
 
 var DefaultConfig = Config{
-	TemplateDir:         "/etc/telegraf/conf.sd-tpl.d",
-	ConfigDir:           "/etc/telegraf/conf.d",
+	TemplateDir:         "/etc/telegraf/sd-tpl.d",
+	ConfigDir:           "/etc/telegraf/telegraf.d",
 	AutoConfPrefix:      "sd-container_",
 	AutoConfExtension:   ".conf",
 	LogLevel:            LOG_WARN,
