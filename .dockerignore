@@ -1,7 +1,16 @@
 # ignore .git, IDE and build directories
-**/.git/
+**/.git
 **/.idea/
 **/.iml
 
 # ignore build state dirs
 /pkg/
+/dist/
+/conf.test.d/
+
+# project build files
+Dockerfile
+Makefile
+*.md
+*.*ignore*
+
