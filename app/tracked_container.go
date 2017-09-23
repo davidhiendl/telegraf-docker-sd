@@ -59,6 +59,7 @@ func (tc *TrackedContainer) WriteConfigFile(contents string) {
 	// open file using READ & WRITE permission
 	file, err := os.OpenFile(tc.GetConfigFile(), os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
+		logger.Errorf("%v: failed to open file: %v err: %v", tc.GetShortID(), tc.GetConfigFile, err)
 		panic(err)
 	}
 	defer file.Close()
@@ -66,12 +67,16 @@ func (tc *TrackedContainer) WriteConfigFile(contents string) {
 	// write some text line-by-line to file
 	_, err = file.WriteString(contents)
 	if err != nil {
+		logger.Errorf("%v: failed to write file: %v err: %v", tc.GetShortID(), tc.GetConfigFile, err)
 		panic(err)
 	}
 
 	// save changes
 	err = file.Sync()
 	if err != nil {
+		logger.Errorf("%v: failed to sync file: %v err: %v", tc.GetShortID(), tc.GetConfigFile, err)
 		panic(err)
 	}
+
+	logger.Infof("%v: wrote configuration: %v", tc.GetShortID(), tc.GetConfigFile())
 }

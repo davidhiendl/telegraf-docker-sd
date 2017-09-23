@@ -67,6 +67,8 @@ func (app *App) processMainTemplateFile() (bool) {
 	}
 
 	app.writeMainConfigFile(configBuffer.String())
+	logger.Infof("Wrote main configuration: %v", app.config.ConfigDir+"/"+TELEGRAF_MAIN_TEMPLATE_DST_FILE)
+
 	return true
 }
 

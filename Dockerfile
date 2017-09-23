@@ -28,7 +28,11 @@ LABEL 	maintainer="David Hiendl <david.hiendl@dhswt.de>"
 # install telegraf
 RUN		curl -o telegraf.deb https://dl.influxdata.com/telegraf/releases/telegraf_1.4.0-1_amd64.deb \
 &&		dpkg -i telegraf.deb \
-&&		rm telegraf.deb
+&&		rm telegraf.deb \
+
+# clean telegraf conf
+&&		cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bak \
+&&		echo "# configured via template _telegraf.goconf\n" > /etc/telegraf/telegraf.conf
 
 # configure services and startup
 ADD		docker/services		/etc/service

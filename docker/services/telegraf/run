@@ -2,4 +2,8 @@
 
 set -eu
 
+# short delay to allow the sd agent to generate the config files initially
+# TODO replace this with a "flag" file, as long as it does not exist sleep, once it exists start, add flag creation logic to sd agent
+sleep 5
+
 telegraf

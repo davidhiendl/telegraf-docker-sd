@@ -37,7 +37,7 @@ func main() {
 	switch {
 
 	case len(os.Args) <= 0:
-		logger.Infof("starting to watch containers for configurations")
+		logger.Infof("starting to watch containers")
 		instance.ClearConfigFiles()
 		instance.Watch()
 
@@ -47,7 +47,7 @@ func main() {
 		instance.Run()
 
 	case os.Args[0] == "watch":
-		logger.Infof("starting to watch containers for configurations")
+		logger.Infof("starting to watch containers")
 		instance.ClearConfigFiles()
 		instance.Watch()
 
@@ -57,7 +57,7 @@ func main() {
 		instance.Reload()
 
 	default:
-		logger.Infof("starting to watch containers for configurations")
+		logger.Infof("starting to watch containers")
 		instance.ClearConfigFiles()
 		instance.Watch()
 	}

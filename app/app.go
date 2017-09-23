@@ -17,30 +17,31 @@ import (
 )
 
 type App struct {
-	config            *Config
-	tagsFromLabels    []string
-	docker            *client.Client
-	ctx               context.Context
-	templates         map[string]*sdtemplate.Template
-	telegrafTemplate  *tgtemplate.Template
-	trackedContainers map[string]*TrackedContainer
-	shouldReload      bool
-	signalDispatcher  []*SignalDispatcher
+	config                *Config
+	tagsFromLabels        []string
+	docker                *client.Client
+	ctx                   context.Context
+	templates             map[string]*sdtemplate.Template
+	telegrafTemplate      *tgtemplate.Template
+	trackedContainers     map[string]*TrackedContainer
+	shouldReload          bool
+	signalDispatcher      []*SignalDispatcher
+	processedMainTemplate bool
 }
 
 // Create new config and populate it from environment
 func NewApp(config *Config, cli *client.Client, ctx context.Context) (*App) {
 	app := App{
-		config:            config,
-		docker:            cli,
-		ctx:               ctx,
-		trackedContainers: make(map[string]*TrackedContainer),
-		shouldReload:      false,
+		config:                config,
+		docker:                cli,
+		ctx:                   ctx,
+		trackedContainers:     make(map[string]*TrackedContainer),
+		shouldReload:          false,
+		processedMainTemplate: false,
 	}
 
 	app.processConfig()
 	app.loadTemplates()
-	app.processMainTemplateFile()
 
 	// register telegraf reload handler
 	app.signalDispatcher = append(app.signalDispatcher, NewSignalHandler("telegraf", syscall.SIGHUP))
@@ -65,6 +66,13 @@ func (app *App) Watch() {
 
 // run templates against containers and generate config
 func (app *App) Run() {
+
+	// update main telegraf config once
+	if !app.processedMainTemplate {
+		app.processMainTemplateFile()
+		app.processedMainTemplate = true
+	}
+
 	app.ProcessContainers()
 	if app.shouldReload {
 		app.Reload()
@@ -75,6 +83,7 @@ func (app *App) Run() {
 func (app *App) Reload() {
 	// fmt.Println("reloading configuration")
 
+	logger.Infof("triggering reload ...")
 	for _, sh := range app.signalDispatcher {
 		sh.Execute()
 	}
