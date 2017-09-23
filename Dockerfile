@@ -32,7 +32,8 @@ RUN		curl -o telegraf.deb https://dl.influxdata.com/telegraf/releases/telegraf_1
 
 # clean telegraf conf
 &&		cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bak \
-&&		echo "# configured via template _telegraf.goconf\n" > /etc/telegraf/telegraf.conf
+&&		echo "# configured via template _telegraf.goconf\n" > /etc/telegraf/telegraf.conf \
+&&		mkdir /etc/telegraf/sd-tpl.d
 
 # configure services and startup
 ADD		docker/services		/etc/service
@@ -44,6 +45,5 @@ RUN		chmod 555 \
 			/etc/service/telegraf/* \
 			/etc/service/telegraf-docker-sd/*
 
-ADD 	sd-tpl.d	/etc/telegraf/sd-tpl.d
 # add binary from previous stage
 COPY    --from=0 /telegraf-docker-sd /usr/local/bin

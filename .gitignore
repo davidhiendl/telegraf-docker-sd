@@ -1,5 +1,5 @@
 **/.idea/
 *.iml
-/conf.test.d/sd-container_*.conf
+/conf.test.d/
 /pkg/
 /dist/

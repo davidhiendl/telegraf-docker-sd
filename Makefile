@@ -8,20 +8,20 @@ source-path = /go/src/github.com/davidhiendl/telegraf-docker-sd
 binary-path = ./dist
 binary-name = telegraf-docker-sd
 
-# build using local go
+# build compressed binary using local go
 build:
 	GOPATH=$$GOPATH:$$PWD/../../../../ \
 	&& echo $$GOPATH \
 	&& go get . \
-	&& go build -i -o $(binary-path)/$(binary-name) ./main.go
+	&& go build -i -ldflags="-s -w" -o $(binary-path)/$(binary-name) ./main.go \
+	&& upx $(binary-path)/compressed/$(binary-name)
 
-# build compressed binary using local go
-build-compressed:
+# build using local go
+build-dev:
 	GOPATH=$$GOPATH:$$PWD/../../../../ \
 	&& echo $$GOPATH \
 	&& go get . \
-	&& go build -i -ldflags="-s -w" -o $(binary-path)/compressed/$(binary-name) ./main.go \
-	&& upx $(binary-path)/compressed/$(binary-name)
+	&& go build -i -o $(binary-path)/$(binary-name) ./main.go
 
 # build image
 image:
