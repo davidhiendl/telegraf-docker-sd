@@ -6,4 +6,4 @@ set -eu
 # TODO replace this with a "flag" file, as long as it does not exist sleep, once it exists start, add flag creation logic to sd agent
 sleep 5
 
-telegraf
+telegraf --config /etc/telegraf/telegraf.conf --config-directory /etc/telegraf/telegraf.d
