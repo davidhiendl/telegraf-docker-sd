@@ -212,7 +212,7 @@ func (app *App) ProcessContainer(cont types.Container) {
 	}
 
 	// write config
-	tracked.WriteConfigFile(configBuffer.String())
+	tracked.WriteConfigFile(app.cleanTemplateOutput(configBuffer.String()))
 
 	// mark as changed
 	app.shouldReload = true

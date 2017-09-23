@@ -16,6 +16,7 @@ type Config struct {
 	TagsFromSwarmLabels bool   `envconfig:"TAG_SWARM_LABELS"`
 	TagsFromLabels      string `envconfig:"TAG_LABELS"`
 	QueryInterval       int    `envconfig:"QUERY_INTERVAL"`
+	CleanOutput         bool   `envconfig:"CLEAN_OUTPUT"`
 }
 
 var SWARM_LABELS = []string{
@@ -41,6 +42,7 @@ var DefaultConfig = Config{
 	TagsFromSwarmLabels: true,
 	TagsFromLabels:      "",
 	QueryInterval:       CONFIG_DEFAULT_QUERY_INTERVAL,
+	CleanOutput:         false,
 }
 
 // Create new config and populate it from environment
@@ -60,6 +62,7 @@ func (c *Config) AsMap() (map[string]string) {
 	m["TagsFromSwarmLabels"] = strconv.FormatBool(c.TagsFromSwarmLabels)
 	m["TagsFromLabels"] = c.TagsFromLabels
 	m["QueryInterval"] = strconv.Itoa(c.QueryInterval)
+	m["CleanOutput"] = strconv.FormatBool(c.CleanOutput)
 
 	return m
 }

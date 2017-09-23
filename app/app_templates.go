@@ -66,7 +66,7 @@ func (app *App) processMainTemplateFile() (bool) {
 		panic(err)
 	}
 
-	app.writeMainConfigFile(configBuffer.String())
+	app.writeMainConfigFile(app.cleanTemplateOutput(configBuffer.String()))
 	logger.Infof("Wrote main configuration: %v", app.config.ConfigDir+"/"+TELEGRAF_MAIN_TEMPLATE_DST_FILE)
 
 	return true
@@ -75,7 +75,7 @@ func (app *App) processMainTemplateFile() (bool) {
 func (app *App) writeMainConfigFile(contents string) {
 	// open file using READ & WRITE permission
 	target := app.config.ConfigDir + "/" + TELEGRAF_MAIN_TEMPLATE_DST_FILE
-	file, err := os.OpenFile(target, os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(target, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		logger.Errorf("Failed to write main config file: %v", target)
 		panic(err)
@@ -95,4 +95,26 @@ func (app *App) writeMainConfigFile(contents string) {
 		logger.Errorf("Failed to write main config file: %v", target)
 		panic(err)
 	}
+}
+
+func (app *App) cleanTemplateOutput(contents string) (string) {
+	if !app.config.CleanOutput {
+		return contents
+	}
+
+
+	regexCleanComments, err := regexp.Compile("(?m:^\\s*#.*$\n)")
+	if err != nil {
+		panic(err)
+	}
+
+	/*
+	regexCleanEmptyLines, err := regexp.Compile("(?m:^\\s*$\\n)")
+	if err != nil {
+		panic(err)
+	}
+	*/
+
+	return regexCleanComments.ReplaceAllString(contents, "")
+	// return regexCleanEmptyLines.ReplaceAllString(regexCleanComments.ReplaceAllString(contents, ""), "\n")
 }
