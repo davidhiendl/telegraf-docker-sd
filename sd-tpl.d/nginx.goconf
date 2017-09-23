@@ -1,4 +1,4 @@
-{{ if .MatchImage "nginx" }}
+{{- if .MatchImage "nginx" }}
 
 # Read Nginx's basic status information (ngx_http_stub_status_module)
 [[inputs.nginx]]
@@ -21,4 +21,4 @@
   {{ $key }} = "{{ $value }}"
   {{ end }}
 
-{{ end }}
+{{ end -}}

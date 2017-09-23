@@ -1,4 +1,4 @@
-{{ if .MatchImage "mysql" }}
+{{- if .MatchImage "mysql" }}
 
 # Read metrics from one or many mysql servers
 [[inputs.mysql]]
@@ -72,4 +72,4 @@
   {{ $key }} = "{{ $value }}"
   {{ end }}
 
-{{ end }}
+{{ end -}}
