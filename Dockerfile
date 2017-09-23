@@ -25,6 +25,9 @@ RUN     go get . \
 FROM    phusion/baseimage:0.9.22
 LABEL   maintainer="David Hiendl <david.hiendl@dhswt.de>"
 
+# configure services and startup
+ADD     docker/etc   /etc
+
 # install telegraf
 RUN     curl -o telegraf.deb https://dl.influxdata.com/telegraf/releases/telegraf_1.4.0-1_amd64.deb \
 &&      dpkg -i telegraf.deb \
@@ -33,14 +36,10 @@ RUN     curl -o telegraf.deb https://dl.influxdata.com/telegraf/releases/telegra
 # clean telegraf conf
 &&      cp /etc/telegraf/telegraf.conf /etc/telegraf/telegraf.conf.bak \
 &&      echo "# configured via template _telegraf.goconf\n" > /etc/telegraf/telegraf.conf \
-&&      mkdir /etc/telegraf/sd-tpl.d
-
-# configure services and startup
-ADD     docker/services     /etc/service
-ADD     docker/my_init.d    /etc/my_init.d
+&&      mkdir /etc/telegraf/sd-tpl.d \
 
 # update permissions
-RUN     chmod 555 \
+&&      chmod 555 \
             /etc/my_init.d/* \
             /etc/service/telegraf/* \
             /etc/service/telegraf-docker-sd/*
