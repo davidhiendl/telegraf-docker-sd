@@ -28,6 +28,10 @@ image:
 	echo "Building telegraf-docker-sd image, this might take a long time..." && \
 	docker build -t $(image-repo):master .
 
+tag-push-testing:
+	docker tag $(image-repo):master $(image-repo):testing && \
+	docker push $(image-repo):testing
+
 show-images:
 	docker images | grep "$(image-repo)"
 
