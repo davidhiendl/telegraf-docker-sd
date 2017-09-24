@@ -18,7 +18,7 @@ By using GO Templates an enormous amount of flexibility can be achieved
 when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
 
-**[Main Template Documentation](doc/MAIN_TEMPLATE.md)**\
+**[Main Template Documentation](doc/MAIN_TEMPLATE.md)** \
 File: [_telegraf.goconf](sd-tpl.d/_telegraf.goconf)
 ```
 ...
@@ -74,11 +74,14 @@ others must be configured manually (pull requests welcome)
 docker run -ti \
     -v "$(PWD)/sd-tpl.d":/etc/telegraf/sd-tpl.d \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v /proc:/rootfs/proc:ro \
+    -v /sys:/rootfs/sys:ro \
+    -v /etc:/rootfs/etc:ro \
     -e TSD_TAG_LABELS="my.custom.label.a,some.other.label.to.use.as.tags,..." \
     dhswt/telegraf-docker-sd:stable
 ```
 
-**Building the image yourself:**\
+**Building the image yourself:** \
 The entire build (including building the binary) is included in the [Dockerfile](Dockerfile).
 ```bash
 docker build -t yourprefix/telegraf-docker-sd:<tag>
