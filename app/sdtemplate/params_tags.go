@@ -23,7 +23,6 @@ func (params *Params) parseExplicitLabelsAsTags() {
 	}
 }
 
-// check and import swarm labels
 func (params *Params) ParseLabelsAsTags(labelsAsTags []string) {
 	for label, value := range params.Container.Labels {
 		for _, matchLabel := range labelsAsTags {

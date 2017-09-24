@@ -59,8 +59,21 @@ func (app *App) processMainTemplateFile() (bool) {
 		return false
 	}
 
+	// include white-listed labels
+	dockerLabels := make(map[string]bool)
+	for _, label := range app.tagsFromLabels {
+		dockerLabels[label] = true
+	}
+
+	// include swarm labels
+	if app.config.TagsFromSwarmLabels {
+		for _, label := range SWARM_LABELS {
+			dockerLabels[label] = true
+		}
+	}
+
 	configBuffer := new(bytes.Buffer)
-	err := app.telegrafTemplate.Execute(tgtemplate.NewParams(), configBuffer)
+	err := app.telegrafTemplate.Execute(tgtemplate.NewParams(dockerLabels), configBuffer)
 	if err != nil {
 		logger.Errorf("Failed to process main config file")
 		panic(err)
@@ -101,7 +114,6 @@ func (app *App) cleanTemplateOutput(contents string) (string) {
 	if !app.config.CleanOutput {
 		return contents
 	}
-
 
 	regexCleanComments, err := regexp.Compile("(?m:^\\s*#.*$\n)")
 	if err != nil {

@@ -13,7 +13,7 @@ type Params struct {
 	Tags      map[string]string
 	Config    map[string]string
 	Image     *types.ImageSummary
-	EnvMap map[string]string
+	EnvMap    map[string]string
 }
 
 // Create new config and populate it from environment
@@ -24,7 +24,7 @@ func NewParams(container types.Container, image *types.ImageSummary) (*Params) {
 		Tags:      make(map[string]string),
 		Config:    make(map[string]string),
 		Image:     image,
-		EnvMap: make(map[string]string),
+		EnvMap:    make(map[string]string),
 	}
 
 	// convert environment to map

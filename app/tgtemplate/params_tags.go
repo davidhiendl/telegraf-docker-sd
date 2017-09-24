@@ -24,3 +24,41 @@ func (params *Params) GlobalTagsFromEnv() map[string]string {
 
 	return results
 }
+
+func (params *Params) DockerLabelsInclude() []string {
+	keys := []string{}
+	for k, v := range params.DockerLabelMap {
+		if v {
+			keys = append(keys, k)
+		}
+	}
+
+	return keys
+}
+
+func toTomlArray(values []string) string {
+	if len(values) <= 0 {
+		return "[]"
+	}
+
+	return `["` + strings.Join(values, `","`) + `"]`
+}
+
+func (params *Params) DockerLabelsIncludeAsTomlArray() string {
+	return toTomlArray(params.DockerLabelsInclude())
+}
+
+func (params *Params) DockerLabelsExclude() []string {
+	keys := []string{}
+	for k, v := range params.DockerLabelMap {
+		if !v {
+			keys = append(keys, k)
+		}
+	}
+
+	return keys
+}
+
+func (params *Params) DockerLabelsExcludeAsTomlArray() string {
+	return toTomlArray(params.DockerLabelsExclude())
+}

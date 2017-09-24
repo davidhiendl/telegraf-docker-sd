@@ -6,13 +6,15 @@ import (
 )
 
 type Params struct {
-	EnvMap map[string]string
+	EnvMap         map[string]string
+	DockerLabelMap map[string]bool
 }
 
 // Create new config and populate it from environment
-func NewParams() (*Params) {
+func NewParams(dockerLabels map[string]bool) (*Params) {
 	params := Params{
-		EnvMap: make(map[string]string),
+		EnvMap:         make(map[string]string),
+		DockerLabelMap: dockerLabels,
 	}
 
 	// convert environment to map
