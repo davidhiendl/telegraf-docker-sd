@@ -21,9 +21,10 @@ func NewTemplate(name string, filePath string) (*Template, error) {
 		fileName: filepath.Base(filePath),
 	}
 
-	gotpl, err := template.ParseFiles(tplw.filePath)
-	tplw.template = gotpl
+	tplw.template = template.New(tplw.fileName)
+	tplw.template.Funcs(TemplateFuncMap)
 
+	_, err := tplw.template.ParseFiles(tplw.filePath)
 	if err != nil {
 		panic(err)
 	}

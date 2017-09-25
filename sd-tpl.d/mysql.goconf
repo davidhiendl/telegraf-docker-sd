@@ -69,7 +69,7 @@
 
   [inputs.nginx.tags]
   {{ range $key, $value := .Tags }}
-  {{ $key }} = "{{ $value }}"
+  {{ $key | escape_tag_key }} = "{{ $value }}"
   {{ end }}
 
 {{ end -}}
