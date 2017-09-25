@@ -46,3 +46,7 @@ func (params *Params) BridgeIP() string {
 func (params *Params) Labels() map[string]string {
 	return params.Container.Labels
 }
+
+func (params *Params) Label(key string) string {
+	return params.Container.Labels[key]
+}
