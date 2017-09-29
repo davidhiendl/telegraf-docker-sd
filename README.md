@@ -114,5 +114,7 @@ If `TSD_TAG_SWARM_LABELS` is set to true then all of these labels are also added
 - com.docker.swarm.task.id
 - com.docker.swarm.task.name
 
-## Build dependencies
-- GO >= 1.8 (should work with 1.7, untested)
+## Dependencies
+- GO >= 1.8 (should work with 1.7, required by docker lib, untested)
+- influxdata/telegraf >= 0.10.1 (re-loading via SIGHUP is required and was implemented at that version)
+- jordansissel/fpm >= 1.9.3 (debian packaging, tested only with 1.9.3, might work with earlier versions)

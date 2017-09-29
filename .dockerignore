@@ -5,8 +5,9 @@
 
 # ignore build state dirs
 /pkg/
-/dist/
+/build/
 /conf.test.d/
+/dist/
 /sd-tpl.d/
 
 # project build files

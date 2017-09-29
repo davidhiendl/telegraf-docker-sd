@@ -1,0 +1,13 @@
+[Unit]
+Description=Telegraf Docker service discovery daemon
+After=network.target
+
+[Service]
+Type=simple
+User=telegraf
+WorkingDirectory=/etc/telegraf
+ExecStart=/usr/local/bin/telegraf-docker-sd
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

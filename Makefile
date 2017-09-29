@@ -9,15 +9,15 @@ binary-path = ./dist
 binary-name = telegraf-docker-sd
 
 # build compressed binary using local go
-build:
+binary:
 	GOPATH=$$GOPATH:$$PWD/../../../../ \
 	&& echo $$GOPATH \
 	&& go get . \
 	&& go build -i -ldflags="-s -w" -o $(binary-path)/$(binary-name) ./main.go \
-	&& upx $(binary-path)/compressed/$(binary-name)
+	&& upx $(binary-path)/$(binary-name)
 
 # build using local go
-build-dev:
+binary-dev:
 	GOPATH=$$GOPATH:$$PWD/../../../../ \
 	&& echo $$GOPATH \
 	&& go get . \
@@ -27,6 +27,10 @@ build-dev:
 image:
 	echo "Building telegraf-docker-sd image, this might take a long time..." && \
 	docker build -t $(image-repo):master .
+
+# create deb package
+package-deb: binary
+	./build/scripts.d/package-deb.sh
 
 tag-push-testing:
 	docker tag $(image-repo):master $(image-repo):testing && \
