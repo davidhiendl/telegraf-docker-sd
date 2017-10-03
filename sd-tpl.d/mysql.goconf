@@ -67,7 +67,7 @@
   # ssl_cert = "/etc/telegraf/cert.pem"
   # ssl_key = "/etc/telegraf/key.pem"
 
-  [inputs.nginx.tags]
+  [inputs.mysql.tags]
   {{ range $key, $value := .Tags }}
   {{ $key | escape_tag_key }} = "{{ $value }}"
   {{ end }}
