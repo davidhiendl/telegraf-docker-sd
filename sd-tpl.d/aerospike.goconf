@@ -1,0 +1,13 @@
+{{ if .MatchImage "aerospike/aerospike-server" }}
+
+[[inputs.aerospike]]
+  # Aerospike servers to connect to (with port)
+  # This plugin will query all namespaces the aerospike server has configured and get stats for them.
+  servers = ["{{.BridgeIP}}:3000"]
+
+  [inputs.aerospike.tags]
+  {{ range $key, $value := .Tags -}}
+  {{ $key | escape_tag_key }} = "{{ $value }}"
+  {{ end -}}
+
+{{ end }}
