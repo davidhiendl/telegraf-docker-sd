@@ -31,7 +31,7 @@ File: [_telegraf.goconf](sd-tpl.d/_telegraf.goconf)
 ...
 ```
 
-**[Full Template Documentation](doc/CONTAINER_TEMPLATE.md)** \
+**[Container Template Documentation](doc/CONTAINER_TEMPLATE.md)** \
 File: [nginx.goconf](sd-tpl.d/nginx.goconf)
 ```
 {{- if .MatchImage "nginx" }}
