@@ -155,7 +155,7 @@ func (app *App) ProcessContainers() {
 
 		// if it does not exist anymore then remove the associated config
 		if !found {
-			logger.Debugf("cleaning up no longer tracked container: %v", id)
+			logger.Debugf("cleaning up no longer tracked container, id=%v file=%v", tracked.GetShortID(), tracked.GetConfigFile())
 			app.cleanupTrackedContainer(tracked)
 		}
 	}
@@ -205,6 +205,7 @@ func (app *App) ProcessContainer(cont types.Container) {
 	// process template(s) for container
 	configBuffer := new(bytes.Buffer)
 	for _, template := range app.templates {
+		logger.Debugf("%v: runnig against template: %v", cont.Names[0], template.Name())
 		err := template.Execute(params, configBuffer)
 		if err != nil {
 			panic(err)
