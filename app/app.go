@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/api/types"
+	client "docker.io/go-docker"
+	"docker.io/go-docker/api/types"
 	"golang.org/x/net/context"
 	"log"
 	"io/ioutil"

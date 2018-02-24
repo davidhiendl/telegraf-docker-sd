@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/docker/docker/client"
+	client "docker.io/go-docker"
 	"golang.org/x/net/context"
 	"os"
 	"github.com/davidhiendl/telegraf-docker-sd/app"

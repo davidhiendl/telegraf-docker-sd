@@ -2,7 +2,7 @@ package app
 
 import (
 	"strings"
-	"github.com/docker/docker/api/types"
+	"docker.io/go-docker/api/types"
 )
 
 func (app *App) processConfig() {

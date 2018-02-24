@@ -1,8 +1,8 @@
 package sdtemplate
 
 import (
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/network"
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/network"
 	"os"
 	"strings"
 )
