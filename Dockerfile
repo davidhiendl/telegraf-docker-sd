@@ -26,7 +26,8 @@ ADD     app     /go/src/github.com/davidhiendl/telegraf-docker-sd/app
 ADD     vendor  /go/src/github.com/davidhiendl/telegraf-docker-sd/vendor
 
 # fetch remaining dependencies and build package
-RUN     go build -i \
+RUN     dep ensure \
+&&      go build -i \
             -o /telegraf-docker-sd \
             -ldflags="-s -w" \
             ./main.go \
