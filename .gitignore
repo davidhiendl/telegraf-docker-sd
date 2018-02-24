@@ -4,3 +4,4 @@
 /pkg/
 /dist/
 secrets.env
+/vendor
