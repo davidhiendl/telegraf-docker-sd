@@ -20,10 +20,8 @@ RUN     curl -o telegraf.tar.gz https://dl.influxdata.com/telegraf/releases/tele
 &&      mv ./telegraf/telegraf / \
 &&      upx /telegraf
 
-# add sources (add manually instead of entire dir to speed up build time for non-code changes)
-ADD     main.go /go/src/github.com/davidhiendl/telegraf-docker-sd/
-ADD     app     /go/src/github.com/davidhiendl/telegraf-docker-sd/app
-ADD     vendor  /go/src/github.com/davidhiendl/telegraf-docker-sd/vendor
+# add sources
+ADD     . /go/src/github.com/davidhiendl/telegraf-docker-sd/
 
 # fetch remaining dependencies and build package
 RUN     dep ensure \
