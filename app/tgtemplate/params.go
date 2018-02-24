@@ -20,7 +20,7 @@ func NewParams(dockerLabels map[string]bool) (*Params) {
 	// convert environment to map
 	for _, e := range os.Environ() {
 		pair := strings.SplitN(e, "=", 2)
-		params.EnvMap[pair[0]] = pair[1]
+		params.EnvMap[pair[0]] = strings.Trim(pair[1], " \r\n")
 	}
 
 	return &params
