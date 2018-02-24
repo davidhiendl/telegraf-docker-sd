@@ -25,8 +25,11 @@ binary-dev:
 
 # build image
 image:
-	echo "Building telegraf-docker-sd image, this might take a long time..." && \
-	docker build -t $(image-repo):master .
+	echo "Building telegraf-docker-sd image, this might take a long time..."; \
+	docker build --squash -t $(image-repo):master .
+
+compose-up:
+	docker-compose up
 
 # create deb package
 package-deb: binary

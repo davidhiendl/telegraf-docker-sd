@@ -1,0 +1,11 @@
+telegraf:
+    image: dhswt/telegraf-docker-sd:master
+    env_file:
+      - secrets.env
+    volumes:
+      - ${PWD}/sd-tpl.d:/etc/telegraf/sd-tpl.d:ro
+      - /etc:/rootfs/etc:ro
+      - /proc:/rootfs/proc:ro
+      - /sys:/rootfs/sys:ro
+      - /var/run/utmp:/var/run/utmp:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro

@@ -77,8 +77,9 @@ docker run -ti \
     -v /proc:/rootfs/proc:ro \
     -v /sys:/rootfs/sys:ro \
     -v /etc:/rootfs/etc:ro \
+    -v /var/run/utmp:/var/run/utmp:ro \
     -e TSD_TAG_LABELS="my.custom.label.a,some.other.label.to.use.as.tags,..." \
-    dhswt/telegraf-docker-sd:stable
+    dhswt/telegraf-docker-sd
 ```
 
 **Building the image yourself:** \

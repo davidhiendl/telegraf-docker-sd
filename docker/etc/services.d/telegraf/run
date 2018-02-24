@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+s6-envuidgid telegraf /usr/local/bin/telegraf \
+    --config /etc/telegraf/telegraf.conf \
+    --config-directory /etc/telegraf/telegraf.d

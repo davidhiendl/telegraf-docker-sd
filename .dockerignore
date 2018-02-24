@@ -8,7 +8,6 @@
 /build/
 /conf.test.d/
 /dist/
-/sd-tpl.d/
 
 # project build files
 Dockerfile

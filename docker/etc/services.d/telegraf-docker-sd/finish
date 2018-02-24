@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv sh
+
+# stop container when telegraf-docker-sd stops or dies
+s6-svscanctl -t /var/run/s6/services

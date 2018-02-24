@@ -2,22 +2,19 @@
 
 # Read metrics from one or many mysql servers
 [[inputs.mysql]]
-  ## specify servers via a url matching:
+
   ##  [username[:password]@][protocol[(address)]]/[?tls=[true|false|skip-verify|custom]]
   ##  see https://github.com/go-sql-driver/mysql#dsn-data-source-name
-  ##  e.g.
   ##    servers = ["user:passwd@tcp(127.0.0.1:3306)/?tls=false"]
   ##    servers = ["user@tcp(127.0.0.1:3306)/?tls=false"]
-
-  ## If no servers are specified, then localhost is used as the host.
-  servers = ["telegraf:telepwd@tcp({{.BridgeIP}}:3306)/"]
+  servers = ["{{.EnvOrDefault "MYSQL_USER" "telegraf"}}:{{.EnvOrDefault "MYSQL_PASS" ""}}@tcp({{.BridgeIP}}:3306)/"]
 
   ## the limits for metrics form perf_events_statements
   perf_events_statements_digest_text_limit  = 120
   perf_events_statements_limit              = 250
   perf_events_statements_time_limit         = 86400
 
-  ## if the list is empty, then metrics are gathered from all databasee tables
+  ## if the list is empty, then metrics are gathered from all database tables
   table_schema_databases                    = []
 
   ## gather metrics from INFORMATION_SCHEMA.TABLES for databases provided above list

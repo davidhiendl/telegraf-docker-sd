@@ -3,3 +3,4 @@
 /conf.test.d/
 /pkg/
 /dist/
+secrets.env
