@@ -47,7 +47,7 @@ func (td *TemplateData) ConfigExists(key string, def string) bool {
 }
 
 func (tds *TemplateData) ConfigEquals(key string, value string) bool {
-	return tds.Container.Labels[key] == value
+	return tds.Config[key] == value
 }
 
 func (tds *TemplateData) ConfigMatches(key string, pattern string) bool {
@@ -56,7 +56,7 @@ func (tds *TemplateData) ConfigMatches(key string, pattern string) bool {
 		logger.Errorf("failed to compile template regex: %v" + pattern)
 	}
 
-	val := tds.LabelOrDefault(key, "")
+	val := tds.ConfigOrDefault(key, "")
 	return regex.MatchString(val)
 }
 
