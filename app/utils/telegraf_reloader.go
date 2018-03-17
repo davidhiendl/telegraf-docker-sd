@@ -1,4 +1,4 @@
-package app
+package utils
 
 import (
 	"log"
@@ -13,21 +13,31 @@ import (
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )
 
-type SignalDispatcher struct {
-	Name   string
-	Signal syscall.Signal
+type TelegrafReloader struct {
+	Name         string
+	Signal       syscall.Signal
+	ShouldReload bool
 }
 
 // Create new config and populate it from environment
-func NewSignalHandler(name string, signal syscall.Signal) (*SignalDispatcher) {
-	sh := SignalDispatcher{
-		Name:   name,
-		Signal: signal,
+func NewTelegrafReloader() *TelegrafReloader {
+	return &TelegrafReloader{
+		Signal:       syscall.SIGHUP,
+		ShouldReload: false,
 	}
-	return &sh
 }
 
-func (sigdp *SignalDispatcher) Execute() {
+func (tr *TelegrafReloader) ReloadIfRequested() {
+	if tr.ShouldReload {
+		tr.Reload()
+	}
+}
+func (tr *TelegrafReloader) Reload() {
+	tr.dispatchSignal()
+	tr.ShouldReload = false
+}
+
+func (tr *TelegrafReloader) dispatchSignal() {
 
 	callback := func(path string, info os.FileInfo, err error) error {
 		// We just return in case of errors, as they are likely due to insufficient
@@ -61,15 +71,15 @@ func (sigdp *SignalDispatcher) Execute() {
 			// Extract the process name from within the first line in the buffer
 			name := string(f[6:bytes.IndexByte(f, '\n')])
 
-			if name == sigdp.Name {
-				logger.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, sigdp.Signal)
+			if name == tr.Name {
+				logger.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, tr.Signal)
 				proc, err := os.FindProcess(pid)
 				if err != nil {
-				logger.Errorf("> Failed to signal, err: %v", err)
+					logger.Errorf("> Failed to signal, err: %v", err)
 					log.Println(err)
 				}
 
-				proc.Signal(sigdp.Signal)
+				proc.Signal(tr.Signal)
 
 				// Let's return a fake error to abort the walk through the rest of the /proc directory tree
 				return io.EOF

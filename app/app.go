@@ -1,101 +1,64 @@
 package app
 
 import (
-	client "docker.io/go-docker"
-	"docker.io/go-docker/api/types"
-	"golang.org/x/net/context"
-	"log"
-	"io/ioutil"
-	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
-	"bytes"
 	"time"
-	"os"
-	"syscall"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
-	"github.com/davidhiendl/telegraf-docker-sd/app/tgtemplate"
+	"github.com/davidhiendl/telegraf-docker-sd/app/config"
+	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
+	"github.com/davidhiendl/telegraf-docker-sd/app/backend"
+	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
+	"github.com/davidhiendl/telegraf-docker-sd/app/constants"
+	"regexp"
+	"os"
+	"io/ioutil"
 )
 
 type App struct {
-	config                *Config
-	tagsFromLabels        []string
-	docker                *client.Client
-	ctx                   context.Context
-	templates             map[string]*sdtemplate.Template
-	telegrafTemplate      *tgtemplate.Template
-	trackedContainers     map[string]*TrackedContainer
-	shouldReload          bool
-	signalDispatcher      []*SignalDispatcher
+	config                *config.ConfigSpec
+	telegrafReloader      *utils.TelegrafReloader
 	processedMainTemplate bool
+	backends              map[string]backend.Backend
+	templates             map[string]*sdtemplate.Template
 }
 
 // Create new config and populate it from environment
-func NewApp(config *Config, cli *client.Client, ctx context.Context) (*App) {
+func NewApp(cfg *config.ConfigSpec) (*App) {
 	app := App{
-		config:                config,
-		docker:                cli,
-		ctx:                   ctx,
-		trackedContainers:     make(map[string]*TrackedContainer),
-		shouldReload:          false,
+		config:                cfg,
 		processedMainTemplate: false,
+		backends:              make(map[string]backend.Backend),
 	}
 
-	app.processConfig()
-	app.loadTemplates()
-
 	// register telegraf reload handler
-	app.signalDispatcher = append(app.signalDispatcher, NewSignalHandler("telegraf", syscall.SIGHUP))
+	app.telegrafReloader = utils.NewTelegrafReloader()
+	logger.Infof("created reloader: %+v", app.telegrafReloader)
+
+	app.loadTemplates()
+	app.loadBackends()
 
 	return &app
 }
 
-// periodically execute Run
-func (app *App) Watch() {
-	raw := app.config.QueryInterval
-	if raw <= 0 {
-		raw = CONFIG_DEFAULT_QUERY_INTERVAL
-	}
+func (app *App) Run() {
+	interval := time.Duration(constants.DEFAULT_QUERY_INTERVAL) * time.Second
 
-	interval := time.Duration(raw) * time.Second
+	app.processGlobalConfig()
 
 	for {
-		app.Run()
+		for _, b := range app.backends {
+			logger.Infof("run backend: %v", b.Name())
+			b.Run()
+		}
+		app.telegrafReloader.ReloadIfRequested()
 		time.Sleep(interval)
 	}
-}
-
-// run templates against containers and generate config
-func (app *App) Run() {
-
-	// update main telegraf config once
-	if !app.processedMainTemplate {
-		app.processMainTemplateFile()
-		app.processedMainTemplate = true
-	}
-
-	app.ProcessContainers()
-	if app.shouldReload {
-		app.Reload()
-	}
-}
-
-// reloads all registered agents
-func (app *App) Reload() {
-	// fmt.Println("reloading configuration")
-
-	logger.Infof("triggering reload ...")
-	for _, sh := range app.signalDispatcher {
-		sh.Execute()
-	}
-
-	app.shouldReload = false
 }
 
 // remove all configuration files that were created by regex: starting with prefix and ending with extension
 func (app *App) ClearConfigFiles() {
 	files, err := ioutil.ReadDir(app.config.ConfigDir)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("failed to clear config: %v", err)
 	}
 
 	// summarized: ^prefix[a-zA-Z0-9._-]*extension$
@@ -117,104 +80,15 @@ func (app *App) ClearConfigFiles() {
 			}
 
 			// do not touch anything that is not a file
-			if stat.IsDir() {
-				logger.Debugf("Config file is directory: %v", path)
+			if !stat.Mode().IsRegular() {
+				logger.Debugf("Config file is not a regular file: %v", path)
 				continue
 			}
 
 			err = os.Remove(path)
 			if err != nil {
-				panic(err)
+				logger.Debugf("failed to remove file: %v, err: %v", path, err)
 			}
 		}
 	}
-}
-
-func (app *App) ProcessContainers() {
-	containers, err := app.docker.ContainerList(app.ctx, types.ContainerListOptions{});
-	if err != nil {
-		logger.Warnf("failed to process container: %v", err)
-		return
-	}
-
-	// check existing containers and configure them
-	for _, cont := range containers {
-		app.ProcessContainer(cont)
-	}
-
-	// iterate over all currently tracked containers and clean up their config files
-	for id, tracked := range app.trackedContainers {
-		found := false
-
-		// check if it still exists
-		for _, cont := range containers {
-			if cont.ID == id {
-				found = true
-			}
-		}
-
-		// if it does not exist anymore then remove the associated config
-		if !found {
-			logger.Debugf("cleaning up no longer tracked container, id=%v file=%v", tracked.GetShortID(), tracked.GetConfigFile())
-			app.cleanupTrackedContainer(tracked)
-		}
-	}
-}
-
-func (app *App) ProcessContainer(cont types.Container) {
-
-	// check if running
-	running := cont.State == "running"
-
-	// check if container already tracked
-	if tracked, ok := app.trackedContainers[cont.ID]; ok {
-		if !running {
-			app.cleanupTrackedContainer(tracked)
-		}
-		return
-	}
-
-	// do not configure if not running
-	if !running {
-		return
-	}
-
-	// check if bridge network exists
-	_, ok := cont.NetworkSettings.Networks["bridge"]
-	if !ok {
-		logger.Debugf("%v: missing network bridge on container, skipping", cont.Names[0])
-		return
-	}
-
-	// assemble template params
-	image := app.getImageForID(cont.ImageID)
-	params := sdtemplate.NewParams(cont, image)
-
-	// add swarm labels if desired
-	if app.config.TagsFromSwarmLabels {
-		params.ParseLabelsAsTags(SWARM_LABELS)
-	}
-
-	logger.Debugf("%v: detected tags: %+v", cont.Names[0], params.Tags)
-	logger.Debugf("%v: detected config: %+v", cont.Names[0], params.Config)
-
-	// register tracked container
-	tracked := NewTrackedContainer(app, cont.ID, params)
-	app.trackedContainers[cont.ID] = tracked
-
-	// process template(s) for container
-	configBuffer := new(bytes.Buffer)
-	for _, template := range app.templates {
-		logger.Debugf("%v: runnig against template: %v", cont.Names[0], template.Name())
-		err := template.Execute(params, configBuffer)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	// write config
-	tracked.WriteConfigFile(app.cleanTemplateOutput(configBuffer.String()))
-
-	// mark as changed
-	app.shouldReload = true
 }

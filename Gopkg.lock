@@ -56,6 +56,12 @@
   version = "v0.3.2"
 
 [[projects]]
+  name = "github.com/fatih/structs"
+  packages = ["."]
+  revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
+  version = "v1.0"
+
+[[projects]]
   name = "github.com/gogo/protobuf"
   packages = ["proto"]
   revision = "100ba4e885062801d56799d78530b73b178a78f3"
@@ -104,9 +110,15 @@
   packages = ["windows"]
   revision = "88d2dcc510266da9f7f8c7f34e1940716cab5f5c"
 
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "7f97868eec74b32b0982dd158a51a446d1da7eb5"
+  version = "v2.1.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "458e8cd3d28ec7348a7a933c666dd38018a564167c57c71770f76fba0b700233"
+  inputs-digest = "cbc802c8774ac472218a7555fdf4a3442fedc9be7b0f886bdce38d0b005ce0de"
   solver-name = "gps-cdcl"
   solver-version = 1

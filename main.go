@@ -1,64 +1,25 @@
 package main
 
 import (
-	client "docker.io/go-docker"
-	"golang.org/x/net/context"
-	"os"
 	"github.com/davidhiendl/telegraf-docker-sd/app"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/config"
+	"github.com/fatih/structs"
 )
 
 func main() {
 
-	// retrieve config
-	config := app.NewConfig()
-	err := config.LoadFromEnv()
-	if err != nil {
-		logger.Fatalf("failed to parse configuration from environment: %v \n", err)
-	}
-
-	logger.SetLevel(config.LogLevel)
+	cfg := config.Load()
+	logger.SetLevel(logger.LOG_DEBUG)
 
 	// print config
-	m := config.AsMap()
+	m := structs.Map(cfg)
+	logger.Infof("configuration loaded: ")
 	for key, value := range m {
-		logger.Infof("Config.%v = %v", key, value)
+		logger.Infof("%v = %v", key, value)
 	}
 
-	// create docker connection
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		logger.Fatalf("Config: %+v\n", config)
-	}
-
-	instance := app.NewApp(config, cli, ctx)
-
-	switch {
-
-	case len(os.Args) <= 0:
-		logger.Infof("starting to watch containers")
-		instance.ClearConfigFiles()
-		instance.Watch()
-
-	case os.Args[0] == "run":
-		logger.Infof("generating configuration for containers")
-		instance.ClearConfigFiles()
-		instance.Run()
-
-	case os.Args[0] == "watch":
-		logger.Infof("starting to watch containers")
-		instance.ClearConfigFiles()
-		instance.Watch()
-
-	case os.Args[0] == "clear":
-		logger.Infof("clearing existing auto-generated configuration files")
-		instance.ClearConfigFiles()
-		instance.Reload()
-
-	default:
-		logger.Infof("starting to watch containers")
-		instance.ClearConfigFiles()
-		instance.Watch()
-	}
+	instance := app.NewApp(cfg)
+	instance.ClearConfigFiles()
+	instance.Run()
 }

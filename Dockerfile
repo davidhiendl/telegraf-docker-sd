@@ -4,7 +4,6 @@ FROM    golang:1.9.4-alpine3.7
 WORKDIR /go/src/github.com/davidhiendl/telegraf-docker-sd
 ENV     TELEGRAF_VERSION 1.5.2
 
-
 # install upx to compress binary
 RUN     apk add --no-cache \
             git \
@@ -12,6 +11,7 @@ RUN     apk add --no-cache \
             upx \
             curl \
 
+# install go dep
 &&      curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 # get telegraf

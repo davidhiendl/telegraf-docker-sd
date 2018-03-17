@@ -13,50 +13,66 @@ the configuration dynamically. This allows for great flexibility and
 the ability to monitor docker containers that are created dynamically by
 orchestration frameworks like Swarm, K8Ns, ...
 
+## 0.3.0-alpha release
+This release is a major refactor and rewrite with the goal to support
+multiple discovery backends (kubernetes is WIP).
+
+Most functions are still supported however the template configuration
+has changed and now uses YAML files to add more structured data with an
+embedded golang template.
+
 ## Example configuration
 By using GO Templates an enormous amount of flexibility can be achieved
 when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
 
 **[Main Template Documentation](doc/MAIN_TEMPLATE.md)** \
-File: [_telegraf.goconf](sd-tpl.d/_telegraf.goconf)
-```
-...
-# Global tags can be specified here in key="value" format.
-[global_tags]
-  # import all environment variables with format "GLOBAL_TAGS_$key=$value" as tags
-  {{ range $key, $value := .GlobalTagsFromEnv }}
-  {{ $key }} = "{{ $value }}"
-{{ end }}
+File: [_telegraf.yaml](sd-tpl.d/_telegraf.yaml)
+```yaml
+backend: global
+template: |
+    # Global tags can be specified here in key="value" format.
+    [global_tags]
+    # import all environment variables with format "GLOBAL_TAGS_$key=$value" as tags
+    {{ as_key_value_map .Tags 2 }}
+
+    # Configuration for telegraf agent
+    [agent]
+      ## Default data collection interval for all inputs
+      interval = "10s"
 ...
 ```
 
 **[Container Template Documentation](doc/CONTAINER_TEMPLATE.md)** \
-File: [nginx.goconf](sd-tpl.d/nginx.goconf)
-```
-{{- if .MatchImage "nginx" }}
+File: [nginx.yaml](sd-tpl.d/nginx.yaml)
+```yaml
+backend: docker
+template: |
+    {{- if .MatchImage "nginx" }}
 
-# Read Nginx's basic status information (ngx_http_stub_status_module)
-[[inputs.nginx]]
-  urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
-           {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
+    # Read Nginx's basic status information (ngx_http_stub_status_module)
+    [[inputs.nginx]]
+      # An array of Nginx stub_status URI to gather stats.
+      urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
+               {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
 
-  # add automatically discovered tags
-  [inputs.nginx.tags]
-  {{ range $key, $value := .Tags }}
-  {{ $key }} = "{{ $value }}"
-  {{ end }}
+      # HTTP response timeout (default: 5s)
+      response_timeout = "5s"
 
-{{end}}
+      # add discovered tags
+      [inputs.nginx.tags]
+      {{ as_key_value_map .Tags 2 }}
+
+    {{ end -}}
 ```
 
 ## Ideas / New template methods / Issues / ... ?
 Feel free to send me a PR or open an issue. I'm open for suggestions / improvements.
 
 **Want to add custom template methods?** \
-Just add new Receivers to the [sdtemplate.Params](sdtemplate/params.go) struct
+Just add new Receivers to the [backend.docker.templatedata](app/backend/docker/templatedata/data.go) struct
 ```go
-func (params *Params) YourCustomTemplateMethod(arg1 string, arg2 string, <<whatever>>) string {
+func (td *TemplateData) YourCustomTemplateMethod(arg1 string, arg2 string, <<whatever>>) string {
     // do something useful
     return "somevalue"
 }
@@ -66,7 +82,7 @@ func (params *Params) YourCustomTemplateMethod(arg1 string, arg2 string, <<whate
 others must be configured manually (pull requests welcome)
 - MySQL
 - NGINX
-- PHP-FPM
+- Aerospike
 
 ## Docker Image
 **Using pre-built image:**
@@ -89,6 +105,8 @@ docker build -t yourprefix/telegraf-docker-sd:<tag>
 ```
 
 ## Configuration Variables
+**TODO needs update, ref:** [ConfigSpec](app/config/config.go) [DockerConfigSpec](app/backend/docker/config.go)
+
 | Variable             | Default                  | Description                                                                                 |
 | ---                  | ---                      | ---                                                                                         |
 | TSD_TEMPLATE_DIR     | /etc/telegraf/sd-tpl.d   | Where configurations templates are taken from                                               |
@@ -116,6 +134,6 @@ If `TSD_TAG_SWARM_LABELS` is set to true then all of these labels are also added
 - com.docker.swarm.task.name
 
 ## Dependencies
-- GO >= 1.8 (should work with 1.7, required by docker lib, untested)
+- GO >= 1.9
 - influxdata/telegraf >= 0.10.1 (re-loading via SIGHUP is required and was implemented at that version)
 - jordansissel/fpm >= 1.9.3 (debian packaging, tested only with 1.9.3, might work with earlier versions)

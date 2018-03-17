@@ -1,0 +1,24 @@
+backend: docker
+template: |
+    {{- if .MatchImage "nginx" }}
+
+    # Read Nginx's basic status information (ngx_http_stub_status_module)
+    [[inputs.nginx]]
+      # An array of Nginx stub_status URI to gather stats.
+      urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
+               {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
+
+      # TLS/SSL configuration
+      # ssl_ca = "/etc/telegraf/ca.pem"
+      # ssl_cert = "/etc/telegraf/cert.cer"
+      # ssl_key = "/etc/telegraf/key.key"
+      # insecure_skip_verify = false
+
+      # HTTP response timeout (default: 5s)
+      response_timeout = "5s"
+
+      # add automatically discovered tags
+      [inputs.nginx.tags]
+      {{ as_key_value_map .Tags 2 }}
+
+    {{ end -}}
