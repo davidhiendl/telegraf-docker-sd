@@ -45,6 +45,16 @@ function test-run-docker {
 	${BINARY_TARGET}
 }
 
+function test-run-kubernetes {
+	BACKENDS=kubernetes \
+	CONFIG_DIR=./conf.test.d \
+	TEMPLATE_DIR=./sd-tpl.d \
+	GLOBAL_TAGS_ABC=some-value-a \
+	GLOBAL_TAGS_DEF=some-value-b \
+	GLOBAL_TAGS_GHI_JKL=some-value-c \
+	${BINARY_TARGET}
+}
+
 function image {
     echo "Building telegraf-docker-sd image, this might take a long time..."; \
 	docker build --squash -t $DOCKER_REPO:dev .
@@ -75,7 +85,11 @@ case "$1" in
         test-run-docker
         ;;
 
+    test-run-kubernetes)
+        test-run-kubernetes
+        ;;
+
     *)
-        echo $"Usage: $0 {build|build-dev|package-dev|glide|image|test-run-docker}"
+        echo $"Usage: $0 {build|build-dev|package-dev|glide|image|test-run-docker|test-run-kubernetes}"
         exit 1
 esac

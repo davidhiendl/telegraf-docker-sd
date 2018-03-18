@@ -12,9 +12,9 @@ import (
 func (app *App) processGlobalConfig() {
 
 	globalConfig := &globalconfig.GlobalConfigSpec{
-		EnvMap:     app.config.EnvMap,
-		Tags: app.config.GlobalTags,
-		Backends:   app.config.Backends,
+		EnvMap:   app.config.EnvMap,
+		Tags:     app.config.GlobalTags,
+		Backends: app.config.Backends,
 	}
 
 	for _, template := range app.templates {
@@ -39,7 +39,7 @@ func (app *App) processGlobalConfig() {
 
 		// write out config file
 		writeConfigFile(configFile, configBuffer.String())
-		logger.Debugf("[global][%v] wrote main config file: %v", configFile)
+		logger.Debugf("[global][%v] wrote main config file: %v", simpleName, configFile)
 	}
 
 }
@@ -65,6 +65,4 @@ func writeConfigFile(path string, contents string) {
 		logger.Errorf("[global] failed to sync file: %v err: %v", path, err)
 		panic(err)
 	}
-
-	logger.Infof("[global] wrote configuration: %v", path, err)
 }
