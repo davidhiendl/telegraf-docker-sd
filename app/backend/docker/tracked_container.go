@@ -38,9 +38,9 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	}
 
 	// debug
-	logger.Debugf("[docker][%v] tags: %+v", tc.ShortID, tc.Data.Tags)
-	logger.Debugf("[docker][%v] config: %+v", tc.ShortID, tc.Data.Config)
-	logger.Debugf("[docker][%v] labels: %+v", tc.ShortID, tc.Data.Container.Labels)
+	logger.Debugf(LOG_PREFIX+"[%v] tags: %+v", tc.ShortID, tc.Data.Tags)
+	logger.Debugf(LOG_PREFIX+"[%v] config: %+v", tc.ShortID, tc.Data.Config)
+	logger.Debugf(LOG_PREFIX+"[%v] labels: %+v", tc.ShortID, tc.Data.Container.Labels)
 
 	return &tc
 }

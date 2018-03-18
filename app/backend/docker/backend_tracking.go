@@ -8,7 +8,7 @@ import (
 )
 
 func (backend *DockerBackend) cleanupContainer(tracked *TrackedContainer) {
-	logger.Debugf("[docker][%v] cleaning up no longer tracked container, file=%v", tracked.ShortID, tracked.GetConfigFile())
+	logger.Debugf(LOG_PREFIX+"[%v] cleaning up no longer tracked container, file=%v", tracked.ShortID, tracked.GetConfigFile())
 	utils.RemoveConfigFile(tracked.GetConfigFile())
 	delete(backend.trackedContainers, tracked.ID)
 	backend.telegrafReloader.ShouldReload = true
@@ -18,7 +18,7 @@ func (backend *DockerBackend) processContainers() {
 
 	containers, err := backend.dockerCli.ContainerList(backend.dockerCtx, types.ContainerListOptions{})
 	if err != nil {
-		logger.Warnf("[docker] failed to process containers: %v", err)
+		logger.Warnf(LOG_PREFIX+" failed to process containers: %v", err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (backend *DockerBackend) processContainers() {
 
 		// if it does not exist anymore then remove the associated config
 		if !found {
-			logger.Debugf("[docker][%v] cleanup up container because it was no longer found", tracked.ShortID)
+			logger.Debugf(LOG_PREFIX+"[%v] cleanup container no longer existing container", tracked.ShortID)
 			backend.cleanupContainer(tracked)
 		}
 	}
@@ -60,7 +60,7 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 	if tracked, ok := backend.trackedContainers[cont.ID]; ok {
 		// cleanup container that stopped running
 		if !running {
-			logger.Debugf("[docker][%v] cleanup up container because it is no longer running")
+			logger.Debugf(LOG_PREFIX + "[%v] cleanup up container because it is no longer running")
 			backend.cleanupContainer(tracked)
 		}
 		return
@@ -74,22 +74,22 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 	// check if bridge network exists
 	_, ok := cont.NetworkSettings.Networks["bridge"]
 	if !ok {
-		logger.Debugf("[docker][%v] missing network bridge on container, skipping", cont.Names[0])
+		logger.Debugf(LOG_PREFIX+"[%v] missing network bridge on container, skipping", cont.Names[0])
 		return
 	}
 
 	// register tracked container
-	logger.Infof("[docker][%v] started tracking: %+v", toShortID(cont.ID), cont.Names)
+	logger.Infof(LOG_PREFIX+"[%v] started tracking: %+v", toShortID(cont.ID), cont.Names)
 	tracked := NewTrackedContainer(backend, cont)
 	backend.trackedContainers[tracked.ID] = tracked
 
 	// process template(s) for container
 	configBuffer := new(bytes.Buffer)
 	for _, template := range backend.templates {
-		logger.Debugf("[docker][%v] running against template: %v", tracked.ShortID, template.FileName)
+		logger.Debugf(LOG_PREFIX+"[%v] running against template: %v", tracked.ShortID, template.FileName)
 		err := template.Execute(configBuffer, tracked.Data)
 		if err != nil {
-			logger.Fatalf("[docker][%v] error during template execution: %+v", cont.Names[0], err)
+			logger.Fatalf(LOG_PREFIX+"[%v] error during template execution: %+v", cont.Names[0], err)
 		}
 	}
 

@@ -9,10 +9,6 @@ import (
 	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
 )
 
-const (
-	NAME = "docker"
-)
-
 type DockerBackend struct {
 	commonConfig     *config.ConfigSpec
 	templates        map[string]*sdtemplate.Template

@@ -44,7 +44,7 @@ func (backend *DockerBackend) prepareDockerClient() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		logger.Fatalf("[docker] failed to connect to docker: %+v\n", err)
+		logger.Fatalf(LOG_PREFIX+" failed to connect to docker: %+v\n", err)
 	}
 
 	// allow selecting API version dynamically
