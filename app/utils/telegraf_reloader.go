@@ -14,27 +14,39 @@ import (
 )
 
 type TelegrafReloader struct {
-	Name         string
-	Signal       syscall.Signal
-	ShouldReload bool
+	name         string
+	signal       syscall.Signal
+	shouldReload bool
 }
 
 // Create new config and populate it from environment
 func NewTelegrafReloader() *TelegrafReloader {
 	return &TelegrafReloader{
-		Signal:       syscall.SIGHUP,
-		ShouldReload: false,
+		signal:       syscall.SIGHUP,
+		shouldReload: false,
 	}
 }
 
+func (tr *TelegrafReloader) Name() string {
+	return tr.name
+}
+
+func (tr *TelegrafReloader) IsReloadRequested() bool {
+	return tr.shouldReload
+}
+
+func (tr *TelegrafReloader) RequestReload() {
+	tr.shouldReload = true
+}
+
 func (tr *TelegrafReloader) ReloadIfRequested() {
-	if tr.ShouldReload {
+	if tr.shouldReload {
 		tr.Reload()
 	}
 }
 func (tr *TelegrafReloader) Reload() {
 	tr.dispatchSignal()
-	tr.ShouldReload = false
+	tr.shouldReload = false
 }
 
 func (tr *TelegrafReloader) dispatchSignal() {
@@ -71,15 +83,15 @@ func (tr *TelegrafReloader) dispatchSignal() {
 			// Extract the process name from within the first line in the buffer
 			name := string(f[6:bytes.IndexByte(f, '\n')])
 
-			if name == tr.Name {
-				logger.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, tr.Signal)
+			if name == tr.name {
+				logger.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, tr.signal)
 				proc, err := os.FindProcess(pid)
 				if err != nil {
 					logger.Errorf("> Failed to signal, err: %v", err)
 					log.Println(err)
 				}
 
-				proc.Signal(tr.Signal)
+				proc.Signal(tr.signal)
 
 				// Let's return a fake error to abort the walk through the rest of the /proc directory tree
 				return io.EOF

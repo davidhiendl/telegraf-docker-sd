@@ -11,7 +11,7 @@ func (backend *DockerBackend) cleanupContainer(tracked *TrackedContainer) {
 	logger.Debugf(LOG_PREFIX+"[%v] cleaning up no longer tracked container, file=%v", tracked.ShortID, tracked.GetConfigFile())
 	utils.RemoveConfigFile(tracked.GetConfigFile())
 	delete(backend.trackedContainers, tracked.ID)
-	backend.telegrafReloader.ShouldReload = true
+	backend.telegrafReloader.RequestReload()
 }
 
 func (backend *DockerBackend) processContainers() {
@@ -97,5 +97,5 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 	utils.WriteConfigFile(tracked.GetConfigFile(), configBuffer.String())
 
 	// mark as changed
-	backend.telegrafReloader.ShouldReload = true
+	backend.telegrafReloader.RequestReload()
 }

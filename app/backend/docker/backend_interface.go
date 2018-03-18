@@ -52,5 +52,5 @@ func (backend *DockerBackend) Clean() {
 		utils.RemoveConfigFile(tc.GetConfigFile())
 		delete(backend.trackedContainers, id)
 	}
-	backend.telegrafReloader.ShouldReload = true
+	backend.telegrafReloader.RequestReload()
 }

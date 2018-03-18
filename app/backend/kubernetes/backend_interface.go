@@ -25,6 +25,7 @@ type KubernetesBackend struct {
 	trackedPods map[types.UID]*TrackedPod
 }
 
+
 func NewBackend() *KubernetesBackend {
 	return &KubernetesBackend{
 		trackedPods: make(map[types.UID]*TrackedPod),
@@ -75,5 +76,5 @@ func (backend *KubernetesBackend) Clean() {
 	for _, pod := range backend.trackedPods {
 		backend.cleanupTrackedPod(pod)
 	}
-	backend.telegrafReloader.ShouldReload = true
+	backend.telegrafReloader.RequestReload()
 }

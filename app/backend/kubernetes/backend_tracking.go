@@ -87,6 +87,7 @@ func (backend *KubernetesBackend) startTrackingPod(pod *corev1.Pod) {
 
 	// add to map
 	backend.trackedPods[trackedPod.UID] = trackedPod
+	backend.telegrafReloader.RequestReload()
 }
 
 // process templates for pod and write config file
