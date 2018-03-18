@@ -1,7 +1,6 @@
 package kubernetes
 
 import (
-	"strings"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"flag"
@@ -13,23 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
 )
-
-func (backend *KubernetesBackend) processConfig() {
-	backend.processConfigLabelsAsTags()
-}
-
-func (backend *KubernetesBackend) processConfigLabelsAsTags() {
-	labelsRaw := strings.Split(backend.config.TagsFromLabels, ",")
-
-	labelsClean := make([]string, len(labelsRaw))
-	i := 0
-	for _, label := range labelsRaw {
-		labelsClean[i] = label
-		i++
-	}
-
-	backend.tags = labelsClean
-}
 
 func (backend *KubernetesBackend) GetRunMode() int {
 	return backend.runMode

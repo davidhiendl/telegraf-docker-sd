@@ -14,7 +14,7 @@ func main() {
 
 	// print config
 	m := structs.Map(cfg)
-	logger.Infof("configuration loaded: ")
+	logger.Infof("[global] configuration loaded:")
 	for key, value := range m {
 		logger.Infof("%v = %v", key, value)
 	}

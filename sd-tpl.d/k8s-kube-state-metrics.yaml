@@ -1,0 +1,12 @@
+backend: kubernetes
+template: |
+    {{- if .AnnotationEquals "telegraf.sd.tags/application" "kube-state-metrics" }}
+
+    [[inputs.prometheus]]
+      ## An array of urls to scrape metrics from.
+      urls = ["http://{{ .TargetIP }}:{{ .ConfigOrDefault "metrics-port" "9100" }}{{ .ConfigOrDefault "metrics-path" "/metrics" }}"]
+
+      [inputs.prometheus.tags]
+      {{ as_key_value_map .Tags 2 }}
+
+    {{ end -}}

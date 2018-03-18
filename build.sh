@@ -10,6 +10,7 @@ function build {
    echo "building binary..."
    echo "> target: ${BINARY_TARGET}"
    go build -i -ldflags="-s -w" -o "${BINARY_TARGET}" ./main.go
+   upx "${BINARY_TARGET}"
 }
 
 function build-dev {
@@ -17,7 +18,6 @@ function build-dev {
    echo "building binary..."
    echo "> target: ${BINARY_TARGET}"
    go build -i -ldflags="-s -w" -o "${BINARY_TARGET}" ./main.go
-   upx "${BINARY_TARGET}"
 }
 
 function package-deb {
@@ -52,7 +52,8 @@ function test-run-kubernetes {
 	GLOBAL_TAGS_ABC=some-value-a \
 	GLOBAL_TAGS_DEF=some-value-b \
 	GLOBAL_TAGS_GHI_JKL=some-value-c \
-	TSD_KUBERNETES_NODE_NAME_OVERRIDE=k8s-prod-master-1 \
+	TSD_KUBERNETES_TAG_LABELS_WHITELIST=app,name \
+	TSD_KUBERNETES_NODE_NAME_OVERRIDE=k8s-prod-worker-3 \
 	${BINARY_TARGET}
 }
 
