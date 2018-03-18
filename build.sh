@@ -52,6 +52,7 @@ function test-run-kubernetes {
 	GLOBAL_TAGS_ABC=some-value-a \
 	GLOBAL_TAGS_DEF=some-value-b \
 	GLOBAL_TAGS_GHI_JKL=some-value-c \
+	TSD_KUBERNETES_NODE_NAME_OVERRIDE=k8s-prod-master-1 \
 	${BINARY_TARGET}
 }
 

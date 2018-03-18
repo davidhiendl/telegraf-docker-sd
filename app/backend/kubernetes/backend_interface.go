@@ -7,8 +7,8 @@ import (
 	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
 	"k8s.io/client-go/kubernetes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
-	"fmt"
 )
 
 const (
@@ -24,6 +24,7 @@ type KubernetesBackend struct {
 	client  *kubernetes.Clientset
 	tags    []string
 	runMode int
+	node    *corev1.Node
 }
 
 func NewBackend() *KubernetesBackend {
@@ -45,11 +46,19 @@ func (backend *KubernetesBackend) Init(spec *backend.BackendConfigSpec) {
 	backend.telegrafReloader = spec.Reloader
 	backend.config = LoadConfig()
 
+	// create client
 	client, err := backend.createKubeClient()
 	if err != nil {
 		logger.Fatalf("failed to create kubernetes client: %+v", err)
 	}
 	backend.client = client
+
+	// find current node
+	node, err := backend.findCurrentKubeNode()
+	if err != nil {
+		logger.Fatalf("failed to find current node: %v", err)
+	}
+	backend.node = node
 }
 
 func (backend *KubernetesBackend) Run() {
@@ -59,8 +68,8 @@ func (backend *KubernetesBackend) Run() {
 		panic(err.Error())
 	}
 
-	fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
-
+	logger.Infof("There are %d pods in the cluster", len(pods.Items))
+	backend.processPodsOnCurrentKubeNode()
 }
 
 func (backend *KubernetesBackend) Clean() {
