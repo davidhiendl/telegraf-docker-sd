@@ -4,11 +4,12 @@ import (
 	"github.com/docker/docker/api/types"
 	"bytes"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
 )
 
 func (backend *DockerBackend) cleanupContainer(tracked *TrackedContainer) {
 	logger.Debugf("[docker][%v] cleaning up no longer tracked container, file=%v", tracked.ShortID, tracked.GetConfigFile())
-	tracked.RemoveConfigFile()
+	utils.RemoveConfigFile(tracked.GetConfigFile())
 	delete(backend.trackedContainers, tracked.ID)
 	backend.telegrafReloader.ShouldReload = true
 }
@@ -93,10 +94,8 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 	}
 
 	// write config
-	tracked.WriteConfigFile(configBuffer.String())
+	utils.WriteConfigFile(tracked.GetConfigFile(), configBuffer.String())
 
 	// mark as changed
 	backend.telegrafReloader.ShouldReload = true
 }
-
-

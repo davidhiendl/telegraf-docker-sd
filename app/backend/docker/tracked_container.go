@@ -4,6 +4,7 @@ import (
 	"github.com/docker/docker/api/types"
 	td "github.com/davidhiendl/telegraf-docker-sd/app/backend/docker/templatedata"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"path/filepath"
 )
 
 // TrackedContainer is used to maintain state about already processed containers and to be able to remove their configurations easily
@@ -42,4 +43,17 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	logger.Debugf("[docker][%v] labels: %+v", tc.ShortID, tc.Data.Container.Labels)
 
 	return &tc
+}
+
+func (tc *TrackedContainer) GetConfigFile() string {
+	if tc.configFile == "" {
+		file, _ := filepath.Abs(
+			tc.backend.commonConfig.ConfigDir +
+				"/" + tc.backend.commonConfig.AutoConfPrefix +
+				tc.backend.Name() + "_" +
+				tc.ShortID +
+				tc.backend.commonConfig.AutoConfExtension)
+		tc.configFile = file
+	}
+	return tc.configFile
 }

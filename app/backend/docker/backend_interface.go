@@ -52,8 +52,8 @@ func (backend *DockerBackend) Run() {
 }
 
 func (backend *DockerBackend) Clean() {
-	for id, container := range backend.trackedContainers {
-		container.RemoveConfigFile()
+	for id, tc := range backend.trackedContainers {
+		utils.RemoveConfigFile(tc.GetConfigFile())
 		delete(backend.trackedContainers, id)
 	}
 	backend.telegrafReloader.ShouldReload = true
