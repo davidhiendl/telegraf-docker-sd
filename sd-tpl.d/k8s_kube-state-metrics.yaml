@@ -7,6 +7,6 @@ template: |
       urls = ["http://{{ .TargetIP }}:{{ .ConfigOrDefault "metrics-port" "9100" }}{{ .ConfigOrDefault "metrics-path" "/metrics" }}"]
 
       [inputs.prometheus.tags]
-      {{ as_key_value_map .Tags 2 }}
+    {{ as_key_value_map .Tags 2 }}
 
     {{ end -}}

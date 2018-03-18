@@ -27,7 +27,7 @@ when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
 
 **[Main Template Documentation](doc/MAIN_TEMPLATE.md)** \
-File: [_telegraf.yaml](sd-tpl.d/_telegraf.yaml)
+File: [_telegraf.yaml](sd-tpl.d/_global_telegraf.yaml)
 ```yaml
 backend: global
 template: |
@@ -43,8 +43,11 @@ template: |
 ...
 ```
 
-**[Container Template Documentation](doc/CONTAINER_TEMPLATE.md)** \
-File: [nginx.yaml](sd-tpl.d/nginx.yaml)
+### Backend: Docker
+Monitor containers based on labels. Works for Swarm and standalone containers.
+
+Docs: [Docker Backend Docs](doc/backend-docker/README.md) \
+Example: [docker_nginx.yaml](sd-tpl.d/docker_nginx.yaml)
 ```yaml
 backend: docker
 template: |
@@ -61,7 +64,27 @@ template: |
 
       # add discovered tags
       [inputs.nginx.tags]
-      {{ as_key_value_map .Tags 2 }}
+    {{ as_key_value_map .Tags 2 }}
+
+    {{ end -}}
+```
+
+### Backend: Kubernetes
+Monitor pods based on annotations and labels. It is also possibly to use the Telegraf "prometheus" input to collect metrics from various prometheus exporters like kube-state-metrics for example:
+
+Docs: [Kubernetes Backend Docs](doc/backend-kubernetes/README.md) \
+Example: [kubernetes_kube-state-metrics.yaml](sd-tpl.d/kubernetes_kube-state-metrics.yaml)
+```yaml
+backend: kubernetes
+template: |
+    {{- if .AnnotationEquals "telegraf.sd.tags/application" "kube-state-metrics" }}
+
+    [[inputs.prometheus]]
+      ## An array of urls to scrape metrics from.
+      urls = ["http://{{ .TargetIP }}:{{ .ConfigOrDefault "metrics-port" "9100" }}{{ .ConfigOrDefault "metrics-path" "/metrics" }}"]
+
+      [inputs.prometheus.tags]
+    {{ as_key_value_map .Tags 2 }}
 
     {{ end -}}
 ```
