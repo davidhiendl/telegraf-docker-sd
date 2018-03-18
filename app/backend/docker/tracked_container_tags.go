@@ -4,9 +4,9 @@ import "regexp"
 
 func (tp *TrackedContainer) parseSwarmLabelsAsTags() {
 	for _, swarmLabel := range SWARM_LABELS {
-		for label,value := range tp.container.Labels {
+		for label,value := range tp.Container.Labels {
 			if label == swarmLabel {
-				tp.Data.Tags[label] = value
+				tp.Tags[label] = value
 				break
 			}
 		}
@@ -21,11 +21,11 @@ func (tp *TrackedContainer) parseLabelsAsTags() {
 		panic(err)
 	}
 
-	for key, value := range tp.container.Labels {
+	for key, value := range tp.Container.Labels {
 		matches := rex.FindAllStringSubmatch(key, -1)
 		if matches != nil {
 			shortName := matches[0][1]
-			tp.Data.Tags[shortName] = value
+			tp.Tags[shortName] = value
 			continue
 		}
 	}
@@ -33,16 +33,16 @@ func (tp *TrackedContainer) parseLabelsAsTags() {
 	// whitelist mode
 	if len(tp.backend.config.TagLabelsWhitelist) > 0 {
 		for _, label := range tp.backend.config.TagLabelsWhitelist {
-			value, ok := tp.container.Labels[label]
+			value, ok := tp.Container.Labels[label]
 			if ok {
-				tp.Data.Tags["k8s_label_"+label] = value
+				tp.Tags["label_"+label] = value
 			}
 		}
 	}
 
 	// blacklist mode
 	if len(tp.backend.config.TagLabelsBlacklist) > 0 {
-		for label, value := range tp.container.Labels {
+		for label, value := range tp.Container.Labels {
 
 			// check if label is in blacklist
 			found := false
@@ -55,7 +55,7 @@ func (tp *TrackedContainer) parseLabelsAsTags() {
 
 			// if label was not found in blacklist
 			if !found {
-				tp.Data.Tags["k8s_label_"+label] = value
+				tp.Tags["label_"+label] = value
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-package templatedata
+package docker
 
 import (
 	"regexp"
@@ -6,7 +6,7 @@ import (
 )
 
 // execute a custom regex pattern against the container image name
-func (td *TemplateData) MatchImageRegex(pattern string) bool {
+func (td *TrackedContainer) MatchImageRegex(pattern string) bool {
 	expr, err := regexp.Compile(pattern)
 	if err != nil {
 		panic(err)
@@ -33,6 +33,6 @@ func (td *TemplateData) MatchImageRegex(pattern string) bool {
 }
 
 // Look for an exact match of the image but ignore the tag
-func (td *TemplateData) MatchImage(pattern string) bool {
+func (td *TrackedContainer) MatchImage(pattern string) bool {
 	return td.MatchImageRegex("^" + regexp.QuoteMeta(pattern) + "(:.*)?$")
 }

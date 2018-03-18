@@ -2,32 +2,43 @@ package docker
 
 import (
 	"github.com/docker/docker/api/types"
-	td "github.com/davidhiendl/telegraf-docker-sd/app/backend/docker/templatedata"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"path/filepath"
+	"strings"
+	"github.com/docker/docker/api/types/network"
 )
 
 // TrackedContainer is used to maintain state about already processed containers and to be able to remove their configurations easily
 type TrackedContainer struct {
-	ID         string
-	ShortID    string
+	ID      string
+	ShortID string
+	Name    string
+
 	backend    *DockerBackend
-	container  *types.Container
 	configFile string
-	Data       *td.TemplateData
+
+	Container *types.Container
+	EnvMap    map[string]string
+	Tags      map[string]string
+	Config    map[string]string
+	Image     *types.ImageSummary
 }
 
 // Create new config and populate it from environment
 func NewTrackedContainer(backend *DockerBackend, container *types.Container) *TrackedContainer {
 	tc := TrackedContainer{
-		ID:        container.ID,
-		ShortID:   toShortID(container.ID),
 		backend:   backend,
-		container: container,
-		Data:      td.NewTemplateData(container),
+		Container: container,
+
+		ID:      container.ID,
+		ShortID: toShortID(container.ID),
+		Name:    strings.TrimLeft(container.Names[0], "/"),
+
+		Config: make(map[string]string),
+		Tags:   make(map[string]string),
 	}
 
-	tc.Data.Image = tc.backend.getImageForID(container.ImageID)
+	tc.Image = tc.backend.getImageForID(container.ImageID)
 
 	// add explicit labels
 	tc.parseLabelsAsTags()
@@ -38,11 +49,19 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	}
 
 	// debug
-	logger.Debugf(LOG_PREFIX+"[%v] tags: %+v", tc.ShortID, tc.Data.Tags)
-	logger.Debugf(LOG_PREFIX+"[%v] config: %+v", tc.ShortID, tc.Data.Config)
-	logger.Debugf(LOG_PREFIX+"[%v] labels: %+v", tc.ShortID, tc.Data.Container.Labels)
+	logger.Debugf(LOG_PREFIX+"[%v] tags: %+v", tc.ShortID, tc.Tags)
+	logger.Debugf(LOG_PREFIX+"[%v] config: %+v", tc.ShortID, tc.Config)
+	logger.Debugf(LOG_PREFIX+"[%v] labels: %+v", tc.ShortID, tc.Container.Labels)
 
 	return &tc
+}
+
+func (td *TrackedContainer) dockerNetBridge() *network.EndpointSettings {
+	return td.Container.NetworkSettings.Networks["bridge"]
+}
+
+func (td *TrackedContainer) BridgeIP() string {
+	return td.dockerNetBridge().IPAddress
 }
 
 func (tc *TrackedContainer) GetConfigFile() string {

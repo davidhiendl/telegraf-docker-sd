@@ -35,3 +35,7 @@ func (backend *DockerBackend) prepareDockerClient() {
 	backend.dockerCtx = ctx
 	backend.dockerCli = cli
 }
+
+func toShortID(id string) string {
+	return id[0:12]
+}

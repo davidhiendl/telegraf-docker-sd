@@ -1,4 +1,4 @@
-package templatedata
+package docker
 
 import (
 	"regexp"
@@ -6,8 +6,8 @@ import (
 )
 
 // extract configuration values from labels
-func (td *TemplateData) parseLabelsAsConfig() {
-	rex, err := regexp.Compile("^" + regexp.QuoteMeta("telegraf.sd.config.") + "([a-zA-Z0-9_\\.\\-]*)$")
+func (td *TrackedContainer) parseLabelsAsConfig() {
+	rex, err := regexp.Compile("^" + regexp.QuoteMeta("telegraf.sd.config.") + "(.+)$")
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +23,7 @@ func (td *TemplateData) parseLabelsAsConfig() {
 	}
 }
 
-func (td *TemplateData) ConfigGet(key string) string {
+func (td *TrackedContainer) ConfigGet(key string) string {
 	value, ok := td.Config[key];
 	if ok {
 		return value
@@ -32,7 +32,7 @@ func (td *TemplateData) ConfigGet(key string) string {
 	}
 }
 
-func (td *TemplateData) ConfigOrDefault(key string, def string) string {
+func (td *TrackedContainer) ConfigOrDefault(key string, def string) string {
 	value, ok := td.Config[key];
 	if ok {
 		return value
@@ -41,16 +41,16 @@ func (td *TemplateData) ConfigOrDefault(key string, def string) string {
 	}
 }
 
-func (td *TemplateData) ConfigExists(key string, def string) bool {
+func (td *TrackedContainer) ConfigExists(key string, def string) bool {
 	_, ok := td.Config[key];
 	return ok
 }
 
-func (tds *TemplateData) ConfigEquals(key string, value string) bool {
+func (tds *TrackedContainer) ConfigEquals(key string, value string) bool {
 	return tds.Config[key] == value
 }
 
-func (tds *TemplateData) ConfigMatches(key string, pattern string) bool {
+func (tds *TrackedContainer) ConfigMatches(key string, pattern string) bool {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
 		logger.Errorf("failed to compile template regex: %v" + pattern)

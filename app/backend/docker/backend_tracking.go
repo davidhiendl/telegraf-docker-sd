@@ -47,9 +47,6 @@ func (backend *DockerBackend) processContainers() {
 	}
 }
 
-func toShortID(id string) string {
-	return id[0:12]
-}
 
 func (backend *DockerBackend) trackContainer(cont *types.Container) {
 
@@ -87,7 +84,7 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 	configBuffer := new(bytes.Buffer)
 	for _, template := range backend.templates {
 		logger.Debugf(LOG_PREFIX+"[%v] running against template: %v", tracked.ShortID, template.FileName)
-		err := template.Execute(configBuffer, tracked.Data)
+		err := template.Execute(configBuffer, tracked)
 		if err != nil {
 			logger.Fatalf(LOG_PREFIX+"[%v] error during template execution: %+v", cont.Names[0], err)
 		}
