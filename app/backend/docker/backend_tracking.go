@@ -1,7 +1,7 @@
 package docker
 
 import (
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
 	"bytes"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )
@@ -15,7 +15,7 @@ func (backend *DockerBackend) cleanupContainer(tracked *TrackedContainer) {
 
 func (backend *DockerBackend) processContainers() {
 
-	containers, err := backend.dockerCli.ContainerList(backend.dockerCtx, types.ContainerListOptions{});
+	containers, err := backend.dockerCli.ContainerList(backend.dockerCtx, types.ContainerListOptions{})
 	if err != nil {
 		logger.Warnf("[docker] failed to process containers: %v", err)
 		return

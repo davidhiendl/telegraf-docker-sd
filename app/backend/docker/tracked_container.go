@@ -1,7 +1,7 @@
 package docker
 
 import (
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
 	td "github.com/davidhiendl/telegraf-docker-sd/app/backend/docker/templatedata"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )

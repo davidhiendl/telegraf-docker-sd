@@ -1,30 +1,30 @@
 # build binary first
 FROM    golang:1.9.4-alpine3.7
 
-WORKDIR /go/src/github.com/davidhiendl/telegraf-docker-sd
-ENV     TELEGRAF_VERSION 1.5.2
-
 # install upx to compress binary
 RUN     apk add --no-cache \
+            glide \
             git \
             mercurial \
             upx \
-            curl \
-
-# install go dep
-&&      curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            curl
 
 # get telegraf
-RUN     curl -o telegraf.tar.gz https://dl.influxdata.com/telegraf/releases/telegraf-${TELEGRAF_VERSION}-static_linux_amd64.tar.gz \
+ENV     TELEGRAF_VERSION 1.5.2
+RUN     mkdir /telegraf-install \
+&&      cd /telegraf-install \
+&&      curl -o telegraf.tar.gz https://dl.influxdata.com/telegraf/releases/telegraf-${TELEGRAF_VERSION}-static_linux_amd64.tar.gz \
 &&      tar xf telegraf.tar.gz \
 &&      mv ./telegraf/telegraf / \
+&&      rm -rf /telegraf-install \
 &&      upx /telegraf
 
 # add sources
+WORKDIR /go/src/github.com/davidhiendl/telegraf-docker-sd
 ADD     . /go/src/github.com/davidhiendl/telegraf-docker-sd/
 
 # fetch remaining dependencies and build package
-RUN     dep ensure \
+RUN     glide install \
 &&      go build -i \
             -o /telegraf-docker-sd \
             -ldflags="-s -w" \

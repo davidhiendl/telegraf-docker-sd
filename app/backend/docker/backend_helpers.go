@@ -1,10 +1,10 @@
 package docker
 
 import (
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
 	"strings"
 	"context"
-	"docker.io/go-docker"
+	"github.com/docker/docker/client"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 )
 
@@ -42,7 +42,7 @@ func (backend *DockerBackend) getImageForID(id string) *types.ImageSummary {
 
 func (backend *DockerBackend) prepareDockerClient() {
 	ctx := context.Background()
-	cli, err := docker.NewEnvClient()
+	cli, err := client.NewEnvClient()
 	if err != nil {
 		logger.Fatalf("[docker] failed to connect to docker: %+v\n", err)
 	}

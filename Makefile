@@ -17,12 +17,6 @@ binary:
 	&& go build -i -ldflags="-s -w" -o $(binary-path)/$(binary-name) ./main.go \
 	&& upx $(binary-path)/$(binary-name)
 
-# build using local go
-binary-dev:
-	GOPATH=$$GOPATH:$(go-path-local) \
-    && go build -i -ldflags="-s -w" -o $(binary-path)/$(binary-name) ./main.go \
-	&& go build -i -o $(binary-path)/$(binary-name) ./main.go
-
 # build image
 image:
 	echo "Building telegraf-docker-sd image, this might take a long time..."; \

@@ -2,7 +2,7 @@ package docker
 
 import (
 	"context"
-	"docker.io/go-docker"
+	"github.com/docker/docker/client"
 	"github.com/davidhiendl/telegraf-docker-sd/app/config"
 	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
 	"github.com/davidhiendl/telegraf-docker-sd/app/backend"
@@ -19,7 +19,7 @@ type DockerBackend struct {
 	telegrafReloader *utils.TelegrafReloader
 
 	config            *DockerConfigSpec
-	dockerCli         *docker.Client
+	dockerCli         *client.Client
 	dockerCtx         context.Context
 	tags              []string
 	trackedContainers map[string]*TrackedContainer
