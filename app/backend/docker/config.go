@@ -13,7 +13,7 @@ type DockerConfigSpec struct {
 
 func LoadConfig() *DockerConfigSpec {
 	cfg := &DockerConfigSpec{}
-	err := envconfig.Process("TSD_DOCKER_", cfg)
+	err := envconfig.Process("TSD_DOCKER", cfg)
 
 	if err != nil {
 		logger.Fatalf("failed to parse config: %v", err)
