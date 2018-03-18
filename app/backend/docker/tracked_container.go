@@ -30,11 +30,11 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	tc.Data.Image = tc.backend.getImageForID(container.ImageID)
 
 	// add explicit labels
-	tc.parseExplicitLabelsAsTags()
+	tc.parseLabelsAsTags()
 
 	// add swarm labels if desired
 	if tc.backend.config.TagsFromSwarm {
-		tc.parseLabelsAsTags(SWARM_LABELS)
+		tc.parseSwarmLabelsAsTags()
 	}
 
 	// debug

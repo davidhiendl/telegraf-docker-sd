@@ -3,12 +3,18 @@ package docker
 import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/davidhiendl/telegraf-docker-sd/app/config"
 )
 
 type DockerConfigSpec struct {
 	AutoConfPrefix string `envconfig:"AUTO_CONF_PREFIX",default:"docker_"`
-	TagsFromLabels string `envconfig:"TAGS_FROM_LABELS"`
 	TagsFromSwarm  bool   `envconfig:"TAGS_FROM_SWARM",default:"true"`
+
+	TagLabelsWhitelistStr string `envconfig:"TAG_LABELS_WHITELIST"`
+	TagLabelsBlacklistStr string `envconfig:"TAG_LABELS_BLACKLIST"`
+
+	TagLabelsWhitelist []string `ignored:"true"`
+	TagLabelsBlacklist []string `ignored:"true"`
 }
 
 func LoadConfig() *DockerConfigSpec {
@@ -17,6 +23,14 @@ func LoadConfig() *DockerConfigSpec {
 
 	if err != nil {
 		logger.Fatalf("failed to parse config: %v", err)
+	}
+
+	// convert list to array
+	cfg.TagLabelsWhitelist = config.ConfigListToArray(cfg.TagLabelsWhitelistStr)
+	cfg.TagLabelsBlacklist = config.ConfigListToArray(cfg.TagLabelsBlacklistStr)
+
+	if len(cfg.TagLabelsWhitelist) > 0 && len(cfg.TagLabelsBlacklist) > 0 {
+		logger.Fatalf(LOG_PREFIX+" cannot have label whitelist and blacklist", err)
 	}
 
 	return cfg

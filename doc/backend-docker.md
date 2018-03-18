@@ -1,5 +1,14 @@
 # Backend: Docker
 
+## Environment Configuration Parameters
+
+| Name                            | Type   | Default | Description                                                                                                                                                                |
+| ---                             | ---    | ---     | ---                                                                                                                                                                        |
+| TSD_DOCKER_TAGS_FROM_SWARM      | bool   | true    | Include swarm system labels as tags (com.docker.swarm.*, com.docker.stack.namespace)                                                                                                                                       |
+| TSD_DOCKER_AUTO_CONF_PREFIX     | string | docker_ | Backend specific prefix for generated files                                                                                                                                |
+| TSD_DOCKER_TAG_LABELS_WHITELIST | string |         | An explicit comma-separated list of labels to include as tags                                                                                                              |
+| TSD_DOCKER_TAG_LABELS_BLACKLIST | string |         | A comma-separated list of labels to exclude from tags, if this value is non-empty all labels except the listed labels will be included. This may cause cardinality issues. |
+
 ## Available functions and variables
 
 | Name              | Type     | Params                     | Return              | Description                                                  |

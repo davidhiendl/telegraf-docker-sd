@@ -1,6 +1,5 @@
 # Telegraf Docker Service Discovery
 
-## Description
 `telegraf-docker-sd` is a lightweight (written in GO) companion for the
 [github.com/influxdata/telegraf](https://github.com/influxdata/telegraf)
 agent with the goal to support flexible configuration in order to detect
