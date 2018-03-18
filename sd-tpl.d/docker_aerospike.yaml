@@ -8,8 +8,6 @@ template: |
       servers = ["{{.BridgeIP}}:3000"]
 
       [inputs.aerospike.tags]
-      {{ range $key, $value := .Tags -}}
-      {{ $key | escape_tag_key }} = "{{ $value }}"
-      {{ end -}}
+    {{ as_key_value_map .Tags 2 }}
 
     {{ end }}

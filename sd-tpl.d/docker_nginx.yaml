@@ -19,6 +19,6 @@ template: |
 
       # add automatically discovered tags
       [inputs.nginx.tags]
-      {{ as_key_value_map .Tags 2 }}
+    {{ as_key_value_map .Tags 2 }}
 
     {{ end -}}
