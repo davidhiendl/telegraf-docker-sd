@@ -19,11 +19,13 @@ RUN     mkdir /telegraf-install \
 &&      rm -rf /telegraf-install \
 &&      upx /telegraf
 
-# add sources
+# add glide config and install dependencies with glide in a separate step to speed up subsequent builds
 WORKDIR /go/src/github.com/davidhiendl/telegraf-docker-sd
-ADD     . /go/src/github.com/davidhiendl/telegraf-docker-sd/
+ADD     glide.lock glide.yaml /go/src/github.com/davidhiendl/telegraf-docker-sd/
+RUN     glide install
 
-# fetch remaining dependencies and build package
+# add source and build package
+ADD     . /go/src/github.com/davidhiendl/telegraf-docker-sd/
 RUN     glide install \
 &&      go build -i \
             -o /telegraf-docker-sd \

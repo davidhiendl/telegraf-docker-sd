@@ -8,10 +8,10 @@
 /build/
 /conf.test.d/
 /dist/
+/vendor/
 
 # project build files
 Dockerfile
-Makefile
 *.md
 *.*ignore*
 

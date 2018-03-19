@@ -62,6 +62,11 @@ function image {
 	docker build --squash -t $DOCKER_REPO:dev .
 }
 
+function push-dev {
+    echo "Pushing telegraf-docker-sd image, this might take a long time..."; \
+	docker push $DOCKER_REPO:dev
+}
+
 case "$1" in
     build)
         build
@@ -81,6 +86,10 @@ case "$1" in
 
     image)
         image
+        ;;
+
+    push-dev)
+        push-dev
         ;;
 
     test-run-docker)
