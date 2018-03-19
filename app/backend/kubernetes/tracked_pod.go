@@ -18,6 +18,7 @@ type TrackedPod struct {
 
 	Config map[string]string
 	Tags   map[string]string
+	Env    map[string]string
 }
 
 // Create new config and populate it from environment
@@ -30,6 +31,7 @@ func NewTrackedPod(backend *KubernetesBackend, pod *corev1.Pod) *TrackedPod {
 
 		Config: make(map[string]string),
 		Tags:   make(map[string]string),
+		Env:    backend.commonConfig.EnvMap,
 	}
 
 	// parse config
@@ -41,10 +43,10 @@ func NewTrackedPod(backend *KubernetesBackend, pod *corev1.Pod) *TrackedPod {
 	tp.parseSystemTags()
 
 	// debug
-	logger.Debugf(LOG_PREFIX + "[%v] config: %+v", tp.Name, tp.Config)
-	logger.Debugf(LOG_PREFIX + "[%v] labels: %+v", tp.Name, tp.Pod.Labels)
-	logger.Debugf(LOG_PREFIX + "[%v] annotations: %+v", tp.Name, tp.Pod.Annotations)
-	logger.Debugf(LOG_PREFIX + "[%v] tags: %+v", tp.Name, tp.Tags)
+	logger.Debugf(LOG_PREFIX+"[%v] config: %+v", tp.Name, tp.Config)
+	logger.Debugf(LOG_PREFIX+"[%v] labels: %+v", tp.Name, tp.Pod.Labels)
+	logger.Debugf(LOG_PREFIX+"[%v] annotations: %+v", tp.Name, tp.Pod.Annotations)
+	logger.Debugf(LOG_PREFIX+"[%v] tags: %+v", tp.Name, tp.Tags)
 
 	return &tp
 }

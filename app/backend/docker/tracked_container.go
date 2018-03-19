@@ -36,6 +36,7 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 
 		Config: make(map[string]string),
 		Tags:   make(map[string]string),
+		Env: backend.commonConfig.EnvMap,
 	}
 
 	tc.Image = tc.backend.getImageForID(container.ImageID)
