@@ -46,7 +46,7 @@ func (app *App) Run() {
 
 	for {
 		for _, b := range app.backends {
-			logger.Infof("run backend: %v", b.Name())
+			logger.Debugf("run backend: %v", b.Name())
 			b.Run()
 		}
 		app.telegrafReloader.ReloadIfRequested()

@@ -7,6 +7,7 @@ Type=simple
 User=telegraf
 WorkingDirectory=/etc/telegraf
 ExecStart=/usr/local/bin/telegraf-docker-sd
+EnvironmentFile=/etc/telegraf/telegraf-docker-sd.env
 Restart=on-abort
 
 [Install]
