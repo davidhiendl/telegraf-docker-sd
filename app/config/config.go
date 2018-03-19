@@ -68,6 +68,9 @@ func Load() *ConfigSpec {
 		logger.Fatalf("failed to parse config: %v", err)
 	}
 
+	// set log level
+	logger.SetLevel(logger.LevelFromString(cfg.LogLevel))
+
 	// convert csv values
 	cfg.Backends = ConfigListToArray(cfg.BackendList)
 

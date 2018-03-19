@@ -37,6 +37,23 @@ func LevelAsString(level int) string {
 	}
 }
 
+func LevelFromString(level string) int {
+	switch(level) {
+	case "none":
+		return LOG_NONE
+	case "error":
+		return LOG_ERROR
+	case "warn":
+		return LOG_WARN
+	case "info":
+		return LOG_INFO
+	case "debug":
+		return LOG_DEBUG
+	default:
+		return 0
+	}
+}
+
 func SetLevel(level int) {
 	maxLevel = level
 }
