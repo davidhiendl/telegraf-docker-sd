@@ -4,6 +4,8 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"github.com/davidhiendl/telegraf-docker-sd/app/config"
+	"os"
+	"path/filepath"
 )
 
 type KubernetesConfigSpec struct {
@@ -18,6 +20,8 @@ type KubernetesConfigSpec struct {
 
 	TagLabelsWhitelist []string `ignored:"true"`
 	TagLabelsBlacklist []string `ignored:"true"`
+
+	KubeConfig string `envconfig:"KUBE_CONFIG"`
 }
 
 func LoadConfig() *KubernetesConfigSpec {
@@ -34,6 +38,10 @@ func LoadConfig() *KubernetesConfigSpec {
 
 	if len(cfg.TagLabelsWhitelist) > 0 && len(cfg.TagLabelsBlacklist) > 0 {
 		logger.Fatalf(LOG_PREFIX+" cannot have label whitelist and blacklist", err)
+	}
+
+	if len(cfg.KubeConfig) <= 0 {
+		cfg.KubeConfig = filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	}
 
 	return cfg
