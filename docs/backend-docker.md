@@ -24,7 +24,7 @@ It is the templates responsibility to determine if the container matches the tem
 
 | Name              | Type     | Params                     | Return              | Description                                                  |
 | ---               | ---      | ---                        | ---                 | ---                                                          |
-| .BridgeIP         | Function | none                       | string              | The actual container bridge ip                               |
+| .TargetIP         | Function | none                       | string              | The actual container bridge ip                               |
 | .Tags             | Variable | none                       | map\[string\]string | A map of all computed tags and values                        |
 | .MatchImage       | Function | pattern string             | bool                | Check container image against provided literal string        |
 | .MatchImageRegex  | Function | key string                 | bool                | Check container image against provided regex                 |
@@ -101,7 +101,7 @@ These variables contain all available data about the container itself. Shortcut 
 
 # Read Nginx's basic status information (ngx_http_stub_status_module)
 [[inputs.nginx]]
-  urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
+  urls = ["http://{{.TargetIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
            {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
 
 {{end}}
@@ -113,7 +113,7 @@ These variables contain all available data about the container itself. Shortcut 
 
 # Read Nginx's basic status information (ngx_http_stub_status_module)
 [[inputs.nginx]]
-  urls = ["http://{{.BridgeIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
+  urls = ["http://{{.TargetIP}}:{{.ConfigOrDefault "nginx_status_port" "8888" -}}
            {{- .ConfigOrDefault "nginx_status_url" "/status/nginx"}}"]
 
   # add automatically discovered tags

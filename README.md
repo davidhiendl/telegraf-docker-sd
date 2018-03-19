@@ -25,27 +25,10 @@ By using GO Templates an enormous amount of flexibility can be achieved
 when creating templates. See the full documentations for a list of
 available methods and variables as well as examples.
 
-**[Main Template Documentation](doc/MAIN_TEMPLATE.md)** \
-File: [_telegraf.yaml](sd-tpl.d/_global_telegraf.yaml)
-```yaml
-backend: global
-template: |
-    # Global tags can be specified here in key="value" format.
-    [global_tags]
-    # import all environment variables with format "GLOBAL_TAGS_$key=$value" as tags
-    {{ as_key_value_map .Tags 2 }}
-
-    # Configuration for telegraf agent
-    [agent]
-      ## Default data collection interval for all inputs
-      interval = "10s"
-...
-```
-
 ### Backend: Docker
 Monitor containers based on labels. Works for Swarm and standalone containers.
 
-Docs: [Docker Backend Docs](doc/backend-docker/README.md) \
+Docs: [Docker Backend Docs](docs/backend-docker.md) \
 Example: [docker_nginx.yaml](sd-tpl.d/docker_nginx.yaml)
 ```yaml
 backend: docker
@@ -71,7 +54,7 @@ template: |
 ### Backend: Kubernetes
 Monitor pods based on annotations and labels. It is also possibly to use the Telegraf "prometheus" input to collect metrics from various prometheus exporters like kube-state-metrics for example:
 
-Docs: [Kubernetes Backend Docs](doc/backend-kubernetes/README.md) \
+Docs: [Kubernetes Backend Docs](docs/backend-kubernetes.md) \
 Example: [kubernetes_kube-state-metrics.yaml](sd-tpl.d/kubernetes_kube-state-metrics.yaml)
 ```yaml
 backend: kubernetes
@@ -129,13 +112,28 @@ docker build -t yourprefix/telegraf-docker-sd:<tag>
 ```
 
 ## Configuration Variables
-**TODO needs update, ref:** [ConfigSpec](app/config/config.go) [DockerConfigSpec](app/backend/docker/config.go)
 
-| Variable             | Default                  | Description                                                                                 |
-| ---                  | ---                      | ---                                                                                         |
-| TSD_TEMPLATE_DIR     | /etc/telegraf/sd-tpl.d   | Where configurations templates are taken from                                               |
-| TSD_CONFIG_DIR       | /etc/telegraf/telegraf.d | Where configurations are written to, the telegraf config directory                          |
-| TSD_QUERY_INTERVAL   | 15                       | Interval in seconds between querying of the docker api for changes                          |
+Any environment variable is available in templates via `.Env*` functions.
+
+The Telegraf main configuration files can also be generated:
+[Global Templates](docs/global-templates.md)
+
+#### Backend specific config
+[ [Docker](docs/backend-docker.md) | [Kubernetes](docs/backend-kubernetes.md) ]
+
+
+#### Global config
+| Variable                | Default                  | Description                                                                                          |
+| ---                     | ---                      | ---                                                                                                  |
+| TSD_TEMPLATE_DIR        | /etc/telegraf/sd-tpl.d   | Where configurations templates are taken from                                                        |
+| TSD_CONFIG_DIR          | /etc/telegraf/telegraf.d | Where configurations are written to, the telegraf config directory                                   |
+| TSD_AUTO_CONF_PREFIX    | tsd_                     | Prefix for auto-generated configuration file. All files matching this prefix are subject to cleanup! |
+| TSD_AUTO_CONF_EXTENSION | .conf                    | Extension for auto-generated files                                                                   |
+| TSD_QUERY_INTERVAL      | 15                       | Interval in seconds between querying of the docker api for changes                                   |
+| TSD_BACKENDS            | *empty*                  | Comma-separated list of backends to use, valid values: docker, kubernetes                            |
+| TSD_GLOBAL_TAGS         | *empty*                  | Comma-separated key-value list of tags, example: "tag_a=value_a,tag_b=value_b,...                    |
+
+
 
 ## Dependencies
 - GO >= 1.9
