@@ -92,9 +92,11 @@ template: |
 Feel free to send me a PR or open an issue. I'm open for suggestions / improvements.
 
 **Want to add custom template methods?** \
-Just add new Receivers to the [backend.docker.templatedata](app/backend/docker/templatedata/data.go) struct
+Just add new Receivers to the tracking structs:
+- [backend.docker.TrackedContainer](app/backend/docker/tracked_container.go)
+- [backend.kubernetes.TrackedPod](app/backend/kubernetes/tracked_pod.go)
 ```go
-func (td *TemplateData) YourCustomTemplateMethod(arg1 string, arg2 string, <<whatever>>) string {
+func (td *TrackedContainer) YourCustomTemplateMethod(arg1 string, arg2 string, <<whatever>>) string {
     // do something useful
     return "somevalue"
 }
@@ -133,8 +135,6 @@ docker build -t yourprefix/telegraf-docker-sd:<tag>
 | ---                  | ---                      | ---                                                                                         |
 | TSD_TEMPLATE_DIR     | /etc/telegraf/sd-tpl.d   | Where configurations templates are taken from                                               |
 | TSD_CONFIG_DIR       | /etc/telegraf/telegraf.d | Where configurations are written to, the telegraf config directory                          |
-| TSD_TAG_SWARM_LABELS | true                     | If docker swarm labels should be imported as tags. See `Container Detection > Swarm Labels` |
-| TSD_TAG_LABELS       | none                     | A list of comma separated labels that should be added as tags                               |
 | TSD_QUERY_INTERVAL   | 15                       | Interval in seconds between querying of the docker api for changes                          |
 
 ## Container Detection
