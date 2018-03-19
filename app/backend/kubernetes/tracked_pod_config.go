@@ -58,4 +58,3 @@ func (tp *TrackedPod) parseAnnotationsAsConfig() {
 		}
 	}
 }
-

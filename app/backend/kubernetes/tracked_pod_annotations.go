@@ -28,7 +28,7 @@ func (tp *TrackedPod) AnnotationExists(key string, def string) bool {
 	return ok
 }
 
-func (tp *TrackedPod)    AnnotationEquals(key string, value string) bool {
+func (tp *TrackedPod) AnnotationEquals(key string, value string) bool {
 	return tp.Pod.Annotations[key] == value
 }
 
