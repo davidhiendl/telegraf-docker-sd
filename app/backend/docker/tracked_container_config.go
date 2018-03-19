@@ -6,25 +6,25 @@ import (
 )
 
 // extract configuration values from labels
-func (td *TrackedContainer) parseLabelsAsConfig() {
+func (tc *TrackedContainer) parseLabelsAsConfig() {
 	rex, err := regexp.Compile("^" + regexp.QuoteMeta("telegraf.sd.config.") + "(.+)$")
 	if err != nil {
 		panic(err)
 	}
 
-	for label, value := range td.Container.Labels {
+	for label, value := range tc.Container.Labels {
 		matches := rex.FindAllStringSubmatch(label, -1)
 		if matches == nil {
 			continue
 		}
 
 		shortName := matches[0][1]
-		td.Config[shortName] = value
+		tc.Config[shortName] = value
 	}
 }
 
-func (td *TrackedContainer) ConfigGet(key string) string {
-	value, ok := td.Config[key];
+func (tc *TrackedContainer) ConfigGet(key string) string {
+	value, ok := tc.Config[key];
 	if ok {
 		return value
 	} else {
@@ -32,8 +32,8 @@ func (td *TrackedContainer) ConfigGet(key string) string {
 	}
 }
 
-func (td *TrackedContainer) ConfigOrDefault(key string, def string) string {
-	value, ok := td.Config[key];
+func (tc *TrackedContainer) ConfigOrDefault(key string, def string) string {
+	value, ok := tc.Config[key];
 	if ok {
 		return value
 	} else {
@@ -41,29 +41,21 @@ func (td *TrackedContainer) ConfigOrDefault(key string, def string) string {
 	}
 }
 
-func (td *TrackedContainer) ConfigExists(key string, def string) bool {
-	_, ok := td.Config[key];
+func (tc *TrackedContainer) ConfigExists(key string, def string) bool {
+	_, ok := tc.Config[key];
 	return ok
 }
 
-func (tds *TrackedContainer) ConfigEquals(key string, value string) bool {
-	return tds.Config[key] == value
+func (tc *TrackedContainer) ConfigEquals(key string, value string) bool {
+	return tc.Config[key] == value
 }
 
-func (tds *TrackedContainer) ConfigMatches(key string, pattern string) bool {
+func (tc *TrackedContainer) ConfigMatches(key string, pattern string) bool {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
 		logger.Errorf("failed to compile template regex: %v" + pattern)
 	}
 
-	val := tds.ConfigOrDefault(key, "")
+	val := tc.ConfigOrDefault(key, "")
 	return regex.MatchString(val)
 }
-
-
-
-
-
-
-
-

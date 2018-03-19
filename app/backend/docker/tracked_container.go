@@ -18,7 +18,7 @@ type TrackedContainer struct {
 	configFile string
 
 	Container *types.Container
-	EnvMap    map[string]string
+	Env       map[string]string
 	Tags      map[string]string
 	Config    map[string]string
 	Image     *types.ImageSummary
@@ -56,12 +56,12 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	return &tc
 }
 
-func (td *TrackedContainer) dockerNetBridge() *network.EndpointSettings {
-	return td.Container.NetworkSettings.Networks["bridge"]
+func (tc *TrackedContainer) dockerNetBridge() *network.EndpointSettings {
+	return tc.Container.NetworkSettings.Networks["bridge"]
 }
 
-func (td *TrackedContainer) BridgeIP() string {
-	return td.dockerNetBridge().IPAddress
+func (tc *TrackedContainer) BridgeIP() string {
+	return tc.dockerNetBridge().IPAddress
 }
 
 func (tc *TrackedContainer) GetConfigFile() string {

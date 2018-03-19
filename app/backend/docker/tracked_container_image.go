@@ -6,21 +6,21 @@ import (
 )
 
 // execute a custom regex pattern against the container image name
-func (td *TrackedContainer) MatchImageRegex(pattern string) bool {
+func (tc *TrackedContainer) MatchImageRegex(pattern string) bool {
 	expr, err := regexp.Compile(pattern)
 	if err != nil {
 		panic(err)
 	}
 
-	if expr.MatchString(td.Container.Image) {
-		logger.Debugf(`matching image = "%v" against pattern = "%v": true`, td.Container.Image, pattern)
+	if expr.MatchString(tc.Container.Image) {
+		logger.Debugf(`matching image = "%v" against pattern = "%v": true`, tc.Container.Image, pattern)
 		return true
 	} else {
-		logger.Debugf(`matching image = "%v" against pattern = "%v": false`, td.Container.Image, pattern)
+		logger.Debugf(`matching image = "%v" against pattern = "%v": false`, tc.Container.Image, pattern)
 	}
 
 	// match against each tag
-	for _, tag := range td.Image.RepoTags {
+	for _, tag := range tc.Image.RepoTags {
 		if expr.MatchString(tag) {
 			logger.Debugf(`matching image = "%v" against pattern = "%v": true`, tag, pattern)
 			return true
@@ -33,6 +33,6 @@ func (td *TrackedContainer) MatchImageRegex(pattern string) bool {
 }
 
 // Look for an exact match of the image but ignore the tag
-func (td *TrackedContainer) MatchImage(pattern string) bool {
-	return td.MatchImageRegex("^" + regexp.QuoteMeta(pattern) + "(:.*)?$")
+func (tc *TrackedContainer) MatchImage(pattern string) bool {
+	return tc.MatchImageRegex("^" + regexp.QuoteMeta(pattern) + "(:.*)?$")
 }
