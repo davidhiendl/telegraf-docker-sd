@@ -16,7 +16,7 @@ func (backend *KubernetesBackend) processPodsOnCurrentKubeNode() error {
 		return err
 	}
 
-	logger.Debugf(LOG_PREFIX + " there are %d trackedPods in the cluster", len(pods.Items))
+	logger.Debugf(LOG_PREFIX + " there are %d pods in the cluster", len(pods.Items))
 
 	uidToPod := make(map[types.UID]*corev1.Pod)
 
@@ -42,7 +42,7 @@ func (backend *KubernetesBackend) processPodsOnCurrentKubeNode() error {
 		}
 	}
 
-	logger.Debugf(LOG_PREFIX + " there are %d trackedPods on current node", len(uidToPod))
+	logger.Debugf(LOG_PREFIX + " there are %d pods on current node", len(uidToPod))
 
 	// check for trackedPods that are still tracked but shouldn't be
 	for uid, trackedPod := range backend.trackedPods {
