@@ -48,7 +48,7 @@ func (backend *KubernetesBackend) Init(spec *backend.BackendConfigSpec) {
 	// print config
 	m := structs.Map(backend.config)
 	for key, value := range m {
-		logrus.WithFields(logrus.Fields{"key": key, "value": value}).Infof(LOG_PREFIX + "configuration loaded")
+		logrus.WithFields(logrus.Fields{"key": key, "value": value}).Infof(LOG_PREFIX + " configuration loaded")
 	}
 
 	// create client
