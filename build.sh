@@ -21,7 +21,6 @@ function build-dev {
 }
 
 function package-deb {
-    set -x
     DEB_VERSION=$1
 
     # version is required
