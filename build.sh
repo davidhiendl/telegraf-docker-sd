@@ -21,8 +21,49 @@ function build-dev {
 }
 
 function package-deb {
+    set -x
+    DEB_VERSION=$1
+
+    # version is required
+    if [ -z "$DEB_VERSION" ]; then
+        echo "Cannot build package, missing DEB_VERSION variable"
+        exit 1
+    fi
+
+    echo "building version: ${DEB_VERSION}"
+
+    # build binary
     build
-    ./build/scripts.d/package-deb.sh
+
+    # prepare paths
+    SRC_DIR="./build/deb.d"
+    DST_DIR="./dist/"
+    BIN_SRC="${DST_DIR}/telegraf-docker-sd"
+    DST_PKG="${DST_DIR}/telegraf-docker-sd_${DEB_VERSION}.deb"
+
+    # check if binary exists
+    if [ ! -e "${BIN_SRC}" ]; then
+        echo "Cannot build package, missing binary"
+        exit 1
+    fi
+
+    # assemble package
+    rm -f "${DST_PKG}"
+    fpm -s dir \
+        -t deb \
+        -n telegraf-docker-sd \
+        --license "MIT" \
+        --maintainer "David Hiendl<david.hiendl@dhswt.de>" \
+        --vendor "DHSWT" \
+        --url "https://github.com/davidhiendl/telegraf-docker-sd" \
+        --description "Automatic Docker service discovery for Telegraf" \
+        -d "telegraf >= 0.10.1" \
+        -v "${DEB_VERSION}" \
+        -p "${DST_PKG}" \
+        --after-install "${SRC_DIR}/after-install.sh" \
+        "${SRC_DIR}/telegraf-docker-sd.service"=/etc/systemd/system/telegraf-docker-sd.service \
+        "${BIN_SRC}"=/usr/local/bin/telegraf-docker-sd
+
 }
 
 function set-gopath {
@@ -71,15 +112,15 @@ function push-dev {
 
 case "$1" in
     build)
-        build
+        build "${@:2}"
         ;;
 
     build-dev)
-        build-dev
+        build-dev "${@:2}"
         ;;
 
     package-deb)
-        package-deb
+        package-deb "${@:2}"
         ;;
 
     exec-glide)
@@ -87,19 +128,19 @@ case "$1" in
         ;;
 
     image)
-        image
+        image "${@:2}"
         ;;
 
     push-dev)
-        push-dev
+        push-dev "${@:2}"
         ;;
 
     test-run-docker)
-        test-run-docker
+        test-run-docker "${@:2}"
         ;;
 
     test-run-kubernetes)
-        test-run-kubernetes
+        test-run-kubernetes "${@:2}"
         ;;
 
     *)
