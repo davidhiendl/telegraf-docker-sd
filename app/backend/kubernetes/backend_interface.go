@@ -25,7 +25,6 @@ type KubernetesBackend struct {
 	trackedPods map[types.UID]*TrackedPod
 }
 
-
 func NewBackend() *KubernetesBackend {
 	return &KubernetesBackend{
 		trackedPods: make(map[types.UID]*TrackedPod),
@@ -48,22 +47,21 @@ func (backend *KubernetesBackend) Init(spec *backend.BackendConfigSpec) {
 
 	// print config
 	m := structs.Map(backend.config)
-	logrus.Infof(LOG_PREFIX + " configuration loaded:")
 	for key, value := range m {
-		logrus.Infof("%v = %v", key, value)
+		logrus.WithFields(logrus.Fields{"key": key, "value": value}).Infof(LOG_PREFIX + "configuration loaded")
 	}
 
 	// create client
 	client, err := backend.createKubeClient()
 	if err != nil {
-		logrus.Fatalf(LOG_PREFIX + " failed to create kubernetes client: %+v", err)
+		logrus.Fatalf(LOG_PREFIX+" failed to create kubernetes client: %+v", err)
 	}
 	backend.client = client
 
 	// find current node
 	node, err := backend.findCurrentKubeNode()
 	if err != nil {
-		logrus.Fatalf(LOG_PREFIX + " failed to find current node: %v", err)
+		logrus.Fatalf(LOG_PREFIX+" failed to find current node: %v", err)
 	}
 	backend.node = node
 }

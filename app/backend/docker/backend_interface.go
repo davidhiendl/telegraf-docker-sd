@@ -7,6 +7,8 @@ import (
 	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
 	"github.com/davidhiendl/telegraf-docker-sd/app/backend"
 	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
+	"github.com/sirupsen/logrus"
+	"github.com/fatih/structs"
 )
 
 type DockerBackend struct {
@@ -40,6 +42,13 @@ func (backend *DockerBackend) Init(spec *backend.BackendConfigSpec) {
 	backend.templates = spec.Templates
 	backend.telegrafReloader = spec.Reloader
 	backend.config = LoadConfig()
+
+	// print config
+	m := structs.Map(backend.config)
+	for key, value := range m {
+		logrus.WithFields(logrus.Fields{"key": key, "value": value}).Infof(LOG_PREFIX + " configuration loaded")
+	}
+
 	backend.prepareDockerClient()
 }
 

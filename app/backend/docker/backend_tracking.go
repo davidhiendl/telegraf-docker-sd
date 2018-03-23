@@ -41,7 +41,7 @@ func (backend *DockerBackend) processContainers() {
 
 		// if it does not exist anymore then remove the associated config
 		if !found {
-			logrus.Debugf(LOG_PREFIX+"[%v] cleanup container no longer existing container", tracked.ShortID)
+			logrus.Infof(LOG_PREFIX+"[%v] cleanup container no longer existing container", tracked.ShortID)
 			backend.cleanupContainer(tracked)
 		}
 	}
@@ -57,7 +57,7 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 	if tracked, ok := backend.trackedContainers[cont.ID]; ok {
 		// cleanup container that stopped running
 		if !running {
-			logrus.Debugf(LOG_PREFIX + "[%v] cleanup up container because it is no longer running")
+			logrus.Infof(LOG_PREFIX + "[%v] cleanup up container because it is no longer running")
 			backend.cleanupContainer(tracked)
 		}
 		return

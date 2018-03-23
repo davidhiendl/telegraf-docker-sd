@@ -50,7 +50,7 @@ func (backend *KubernetesBackend) processPodsOnCurrentKubeNode() error {
 
 		shouldTrack := backend.shouldTrackPod(pod)
 		if !ok || !shouldTrack {
-			logrus.Debugf(LOG_PREFIX + " stopping to track pod: found_in_cluster=%v, shouldTrack=%v", ok, shouldTrack)
+			logrus.Infof(LOG_PREFIX + " stopping to track pod: found_in_cluster=%v, shouldTrack=%v", ok, shouldTrack)
 			backend.cleanupTrackedPod(trackedPod)
 		}
 	}
@@ -74,7 +74,7 @@ func (backend *KubernetesBackend) shouldTrackPod(pod *corev1.Pod) bool {
 
 // initialize pod tracking
 func (backend *KubernetesBackend) startTrackingPod(pod *corev1.Pod) {
-	logrus.Debugf(LOG_PREFIX + "[%v] starting to track pod", pod.Name)
+	logrus.Infof(LOG_PREFIX + "[%v] starting to track pod", pod.Name)
 	podIP := pod.Status.PodIP
 
 	logrus.Debugf(LOG_PREFIX + "[%v] detected IP: %v", pod.Name, podIP)
