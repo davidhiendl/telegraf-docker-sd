@@ -30,12 +30,13 @@ function set-gopath {
     GOPATH=$GOPATH:$LOCAL_GO_PATH
 }
 
-function glide {
+function exec-glide {
     set-gopath
-    glide "${@:2}"
+    glide "${@:1}"
 }
 
 function test-run-docker {
+    echo "running with backends=docker ..."
 	BACKENDS=docker \
 	CONFIG_DIR=./conf.test.d \
 	TEMPLATE_DIR=./sd-tpl.d \
@@ -46,6 +47,7 @@ function test-run-docker {
 }
 
 function test-run-kubernetes {
+    echo "running with backends=kubernetes ..."
 	BACKENDS=kubernetes \
 	CONFIG_DIR=./conf.test.d \
 	TEMPLATE_DIR=./sd-tpl.d \
@@ -80,8 +82,8 @@ case "$1" in
         package-deb
         ;;
 
-    glide)
-        glide
+    exec-glide)
+        exec-glide "${@:2}"
         ;;
 
     image)
