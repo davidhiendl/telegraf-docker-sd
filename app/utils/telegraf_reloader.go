@@ -10,7 +10,7 @@ import (
 	"io"
 	"syscall"
 	"path/filepath"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 type TelegrafReloader struct {
@@ -67,7 +67,7 @@ func (tr *TelegrafReloader) dispatchSignal() {
 			// convert the <pid> into an integer. Log an error if it fails.
 			pid, err := strconv.Atoi(path[6:strings.LastIndex(path, "/")])
 			if err != nil {
-				logger.Debugf("failed to extract pid from path: %v", path)
+				logrus.Debugf("failed to extract pid from path: %v", path)
 				return nil
 			}
 
@@ -84,10 +84,10 @@ func (tr *TelegrafReloader) dispatchSignal() {
 			name := string(f[6:bytes.IndexByte(f, '\n')])
 
 			if name == tr.name {
-				logger.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, tr.signal)
+				logrus.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, tr.signal)
 				proc, err := os.FindProcess(pid)
 				if err != nil {
-					logger.Errorf("> Failed to signal, err: %v", err)
+					logrus.Errorf("> Failed to signal, err: %v", err)
 					log.Println(err)
 				}
 

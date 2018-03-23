@@ -2,7 +2,7 @@ package kubernetes
 
 import (
 	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func (tp *TrackedPod) AnnotationGet(key string) string {
@@ -35,7 +35,7 @@ func (tp *TrackedPod) AnnotationEquals(key string, value string) bool {
 func (tp *TrackedPod) AnnotationMatches(key string, pattern string) bool {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
-		logger.Errorf("failed to compile template regex: %v" + pattern)
+		logrus.Errorf("failed to compile template regex: %v" + pattern)
 	}
 
 	val := tp.AnnotationOrDefault(key, "")

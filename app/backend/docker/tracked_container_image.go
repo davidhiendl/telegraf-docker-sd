@@ -2,7 +2,7 @@ package docker
 
 import (
 	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 // execute a custom regex pattern against the container image name
@@ -13,19 +13,19 @@ func (tc *TrackedContainer) MatchImageRegex(pattern string) bool {
 	}
 
 	if expr.MatchString(tc.Container.Image) {
-		logger.Debugf(`matching image = "%v" against pattern = "%v": true`, tc.Container.Image, pattern)
+		logrus.Debugf(`matching image = "%v" against pattern = "%v": true`, tc.Container.Image, pattern)
 		return true
 	} else {
-		logger.Debugf(`matching image = "%v" against pattern = "%v": false`, tc.Container.Image, pattern)
+		logrus.Debugf(`matching image = "%v" against pattern = "%v": false`, tc.Container.Image, pattern)
 	}
 
 	// match against each tag
 	for _, tag := range tc.Image.RepoTags {
 		if expr.MatchString(tag) {
-			logger.Debugf(`matching image = "%v" against pattern = "%v": true`, tag, pattern)
+			logrus.Debugf(`matching image = "%v" against pattern = "%v": true`, tag, pattern)
 			return true
 		} else {
-			logger.Debugf(`matching image = "%v" against pattern = "%v": false`, tag, pattern)
+			logrus.Debugf(`matching image = "%v" against pattern = "%v": false`, tag, pattern)
 		}
 	}
 

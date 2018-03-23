@@ -2,8 +2,8 @@ package docker
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"github.com/davidhiendl/telegraf-docker-sd/app/config"
+	"github.com/sirupsen/logrus"
 )
 
 type DockerConfigSpec struct {
@@ -22,7 +22,7 @@ func LoadConfig() *DockerConfigSpec {
 	err := envconfig.Process("TSD_DOCKER", cfg)
 
 	if err != nil {
-		logger.Fatalf("failed to parse config: %v", err)
+		logrus.Fatalf("failed to parse config: %v", err)
 	}
 
 	// convert list to array
@@ -30,7 +30,7 @@ func LoadConfig() *DockerConfigSpec {
 	cfg.TagLabelsBlacklist = config.ConfigListToArray(cfg.TagLabelsBlacklistStr)
 
 	if len(cfg.TagLabelsWhitelist) > 0 && len(cfg.TagLabelsBlacklist) > 0 {
-		logger.Fatalf(LOG_PREFIX+" cannot have label whitelist and blacklist", err)
+		logrus.Fatalf(LOG_PREFIX+" cannot have label whitelist and blacklist", err)
 	}
 
 	return cfg

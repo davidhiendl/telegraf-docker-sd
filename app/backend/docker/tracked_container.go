@@ -2,10 +2,10 @@ package docker
 
 import (
 	"github.com/docker/docker/api/types"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"path/filepath"
 	"strings"
 	"github.com/docker/docker/api/types/network"
+	"github.com/sirupsen/logrus"
 )
 
 // TrackedContainer is used to maintain state about already processed containers and to be able to remove their configurations easily
@@ -50,9 +50,9 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	}
 
 	// debug
-	logger.Debugf(LOG_PREFIX+"[%v] tags: %+v", tc.ShortID, tc.Tags)
-	logger.Debugf(LOG_PREFIX+"[%v] config: %+v", tc.ShortID, tc.Config)
-	logger.Debugf(LOG_PREFIX+"[%v] labels: %+v", tc.ShortID, tc.Container.Labels)
+	logrus.Debugf(LOG_PREFIX+"[%v] tags: %+v", tc.ShortID, tc.Tags)
+	logrus.Debugf(LOG_PREFIX+"[%v] config: %+v", tc.ShortID, tc.Config)
+	logrus.Debugf(LOG_PREFIX+"[%v] labels: %+v", tc.ShortID, tc.Container.Labels)
 
 	return &tc
 }

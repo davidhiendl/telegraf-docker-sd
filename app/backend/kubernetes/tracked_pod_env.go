@@ -2,7 +2,7 @@ package kubernetes
 
 import (
 	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func (tc *TrackedPod) EnvGet(key string) string {
@@ -31,7 +31,7 @@ func (tc *TrackedPod) EnvEquals(key string, value string) bool {
 func (tc *TrackedPod) EnvMatches(key string, pattern string) bool {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
-		logger.Errorf("failed to compile template regex: %v" + pattern)
+		logrus.Errorf("failed to compile template regex: %v" + pattern)
 	}
 
 	val := tc.EnvOrDefault(key, "")

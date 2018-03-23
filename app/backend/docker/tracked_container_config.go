@@ -2,7 +2,7 @@ package docker
 
 import (
 	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 // extract configuration values from labels
@@ -53,7 +53,7 @@ func (tc *TrackedContainer) ConfigEquals(key string, value string) bool {
 func (tc *TrackedContainer) ConfigMatches(key string, pattern string) bool {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
-		logger.Errorf("failed to compile template regex: %v" + pattern)
+		logrus.Errorf("failed to compile template regex: %v" + pattern)
 	}
 
 	val := tc.ConfigOrDefault(key, "")

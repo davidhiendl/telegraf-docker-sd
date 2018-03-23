@@ -2,10 +2,10 @@ package kubernetes
 
 import (
 	"github.com/kelseyhightower/envconfig"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"github.com/davidhiendl/telegraf-docker-sd/app/config"
 	"os"
 	"path/filepath"
+	"github.com/sirupsen/logrus"
 )
 
 type KubernetesConfigSpec struct {
@@ -29,7 +29,7 @@ func LoadConfig() *KubernetesConfigSpec {
 	err := envconfig.Process("TSD_KUBERNETES", cfg)
 
 	if err != nil {
-		logger.Fatalf(LOG_PREFIX+" failed to parse config: %v", err)
+		logrus.Fatalf(LOG_PREFIX+" failed to parse config: %v", err)
 	}
 
 	// convert list to array
@@ -37,7 +37,7 @@ func LoadConfig() *KubernetesConfigSpec {
 	cfg.TagLabelsBlacklist = config.ConfigListToArray(cfg.TagLabelsBlacklistStr)
 
 	if len(cfg.TagLabelsWhitelist) > 0 && len(cfg.TagLabelsBlacklist) > 0 {
-		logger.Fatalf(LOG_PREFIX+" cannot have label whitelist and blacklist", err)
+		logrus.Fatalf(LOG_PREFIX+" cannot have label whitelist and blacklist", err)
 	}
 
 	if len(cfg.KubeConfig) <= 0 {

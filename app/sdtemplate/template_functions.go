@@ -5,7 +5,7 @@ import (
 	"strings"
 	"fmt"
 	"strconv"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 var TemplateFuncMap = template.FuncMap{
@@ -26,7 +26,7 @@ func FormatIndent(value string, spaces string) string {
 
 	spacesInt, err := strconv.Atoi(spaces)
 	if err != nil {
-		logger.Fatalf(`failed to parse indent: value="%v" count="%v"`, value, spaces)
+		logrus.Fatalf(`failed to parse indent: value="%v" count="%v"`, value, spaces)
 	}
 
 	rows := strings.Split(value, "\n")

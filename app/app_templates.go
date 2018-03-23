@@ -5,8 +5,8 @@ import (
 	"log"
 	"regexp"
 	"os"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
+	"github.com/sirupsen/logrus"
 )
 
 const TELEGRAF_MAIN_TEMPLATE_SRC_FILE = "_telegraf.goconf"
@@ -31,11 +31,11 @@ func (app *App) loadTemplates() {
 
 		name := matches[0][1]
 		filePath := app.config.TemplateDir + "/" + f.Name()
-		logger.Infof("loading config template: %v from %v", name, filePath)
+		logrus.Infof("loading config template: %v from %v", name, filePath)
 
 		tpl, err := sdtemplate.NewTemplate(filePath)
 		if err != nil {
-			logger.Fatalf("failed to parse template file: %v, %v", filePath, err)
+			logrus.Fatalf("failed to parse template file: %v, %v", filePath, err)
 		}
 
 		templates[tpl.FileName] = tpl
@@ -68,12 +68,12 @@ func (app *App) processMainTemplateFile() (bool) {
 	configBuffer := new(bytes.Buffer)
 	err := app.telegrafTemplate.Execute(maintemplate.NewParams(dockerLabels), configBuffer)
 	if err != nil {
-		logger.Errorf("Failed to process main config file")
+		logrus.Errorf("Failed to process main config file")
 		panic(err)
 	}
 
 	app.writeMainConfigFile(app.cleanTemplateOutput(configBuffer.String()))
-	logger.Infof("Wrote main configuration: %v", app.config.Args.ConfigDir+"/"+TELEGRAF_MAIN_TEMPLATE_DST_FILE)
+	logrus.Infof("Wrote main configuration: %v", app.config.Args.ConfigDir+"/"+TELEGRAF_MAIN_TEMPLATE_DST_FILE)
 
 	return true
 }
@@ -84,7 +84,7 @@ func (app *App) writeMainConfigFile(contents string) {
 	target := app.config.ConfigDir + "/" + TELEGRAF_MAIN_TEMPLATE_DST_FILE
 	file, err := os.OpenFile(target, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		logger.Errorf("Failed to write main config file: %v", target)
+		logrus.Errorf("Failed to write main config file: %v", target)
 		panic(err)
 	}
 	defer file.Close()
@@ -92,14 +92,14 @@ func (app *App) writeMainConfigFile(contents string) {
 	// write some text line-by-line to file
 	_, err = file.WriteString(contents)
 	if err != nil {
-		logger.Errorf("Failed to write main config file: %v", target)
+		logrus.Errorf("Failed to write main config file: %v", target)
 		panic(err)
 	}
 
 	// save changes
 	err = file.Sync()
 	if err != nil {
-		logger.Errorf("Failed to write main config file: %v", target)
+		logrus.Errorf("Failed to write main config file: %v", target)
 		panic(err)
 	}
 }

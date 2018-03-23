@@ -2,7 +2,6 @@ package app
 
 import (
 	"time"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"github.com/davidhiendl/telegraf-docker-sd/app/config"
 	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
 	"github.com/davidhiendl/telegraf-docker-sd/app/backend"
@@ -11,6 +10,7 @@ import (
 	"regexp"
 	"os"
 	"io/ioutil"
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
@@ -31,7 +31,7 @@ func NewApp(cfg *config.ConfigSpec) (*App) {
 
 	// register telegraf reload handler
 	app.telegrafReloader = utils.NewTelegrafReloader()
-	logger.Infof("created reloader: %+v", app.telegrafReloader)
+	logrus.Infof("created reloader: %+v", app.telegrafReloader)
 
 	app.loadTemplates()
 	app.loadBackends()
@@ -46,7 +46,7 @@ func (app *App) Run() {
 
 	for {
 		for _, b := range app.backends {
-			logger.Debugf("run backend: %v", b.Name())
+			logrus.Debugf("run backend: %v", b.Name())
 			b.Run()
 		}
 		app.telegrafReloader.ReloadIfRequested()
@@ -58,7 +58,7 @@ func (app *App) Run() {
 func (app *App) ClearConfigFiles() {
 	files, err := ioutil.ReadDir(app.config.ConfigDir)
 	if err != nil {
-		logger.Fatalf("failed to clear config: %v", err)
+		logrus.Fatalf("failed to clear config: %v", err)
 	}
 
 	// summarized: ^prefix[a-zA-Z0-9._-]*extension$
@@ -71,7 +71,7 @@ func (app *App) ClearConfigFiles() {
 
 	for _, f := range files {
 		if rex.MatchString(f.Name()) {
-			logger.Debugf("cleaning up file: %v", f.Name())
+			logrus.Debugf("cleaning up file: %v", f.Name())
 			path := app.config.ConfigDir + "/" + f.Name()
 
 			stat, err := os.Stat(path)
@@ -81,13 +81,13 @@ func (app *App) ClearConfigFiles() {
 
 			// do not touch anything that is not a file
 			if !stat.Mode().IsRegular() {
-				logger.Debugf("Config file is not a regular file: %v", path)
+				logrus.Debugf("Config file is not a regular file: %v", path)
 				continue
 			}
 
 			err = os.Remove(path)
 			if err != nil {
-				logger.Debugf("failed to remove file: %v, err: %v", path, err)
+				logrus.Debugf("failed to remove file: %v, err: %v", path, err)
 			}
 		}
 	}

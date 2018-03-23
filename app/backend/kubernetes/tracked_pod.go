@@ -1,10 +1,10 @@
 package kubernetes
 
 import (
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"path/filepath"
+	"github.com/sirupsen/logrus"
 )
 
 // TrackedPod is used to maintain state about already processed containers and to be able to remove their configurations easily
@@ -43,10 +43,10 @@ func NewTrackedPod(backend *KubernetesBackend, pod *corev1.Pod) *TrackedPod {
 	tp.parseSystemTags()
 
 	// debug
-	logger.Debugf(LOG_PREFIX+"[%v] config: %+v", tp.Name, tp.Config)
-	logger.Debugf(LOG_PREFIX+"[%v] labels: %+v", tp.Name, tp.Pod.Labels)
-	logger.Debugf(LOG_PREFIX+"[%v] annotations: %+v", tp.Name, tp.Pod.Annotations)
-	logger.Debugf(LOG_PREFIX+"[%v] tags: %+v", tp.Name, tp.Tags)
+	logrus.Debugf(LOG_PREFIX+"[%v] config: %+v", tp.Name, tp.Config)
+	logrus.Debugf(LOG_PREFIX+"[%v] labels: %+v", tp.Name, tp.Pod.Labels)
+	logrus.Debugf(LOG_PREFIX+"[%v] annotations: %+v", tp.Name, tp.Pod.Annotations)
+	logrus.Debugf(LOG_PREFIX+"[%v] tags: %+v", tp.Name, tp.Tags)
 
 	return &tp
 }

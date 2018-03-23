@@ -7,9 +7,9 @@ import (
 	"github.com/davidhiendl/telegraf-docker-sd/app/utils"
 	"k8s.io/client-go/kubernetes"
 	corev1 "k8s.io/api/core/v1"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"k8s.io/apimachinery/pkg/types"
 	"github.com/fatih/structs"
+	"github.com/sirupsen/logrus"
 )
 
 type KubernetesBackend struct {
@@ -48,22 +48,22 @@ func (backend *KubernetesBackend) Init(spec *backend.BackendConfigSpec) {
 
 	// print config
 	m := structs.Map(backend.config)
-	logger.Infof(LOG_PREFIX + " configuration loaded:")
+	logrus.Infof(LOG_PREFIX + " configuration loaded:")
 	for key, value := range m {
-		logger.Infof("%v = %v", key, value)
+		logrus.Infof("%v = %v", key, value)
 	}
 
 	// create client
 	client, err := backend.createKubeClient()
 	if err != nil {
-		logger.Fatalf(LOG_PREFIX + " failed to create kubernetes client: %+v", err)
+		logrus.Fatalf(LOG_PREFIX + " failed to create kubernetes client: %+v", err)
 	}
 	backend.client = client
 
 	// find current node
 	node, err := backend.findCurrentKubeNode()
 	if err != nil {
-		logger.Fatalf(LOG_PREFIX + " failed to find current node: %v", err)
+		logrus.Fatalf(LOG_PREFIX + " failed to find current node: %v", err)
 	}
 	backend.node = node
 }

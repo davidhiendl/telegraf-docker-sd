@@ -3,10 +3,10 @@ package config
 import (
 	"github.com/kelseyhightower/envconfig"
 	"path/filepath"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"strings"
 	"os"
 	"github.com/davidhiendl/telegraf-docker-sd/app/constants"
+	"github.com/sirupsen/logrus"
 )
 
 type ConfigSpec struct {
@@ -14,7 +14,7 @@ type ConfigSpec struct {
 	ConfigDir         string `envconfig:"CONFIG_DIR" default:"/etc/telegraf/telegraf.d"`
 	AutoConfPrefix    string `envconfig:"AUTO_CONF_PREFIX" default:"tsd_"`
 	AutoConfExtension string `envconfig:"AUTO_CONF_EXTENSION" default:".conf"`
-	LogLevel          string `envconfig:"LOG_LEVEL" default:"warn"`
+	LogLevel          string `envconfig:"LOG_LEVEL" default:"info"`
 	CleanOutput       bool   `envconfig:"CLEAN_OUTPUT" default:"true"`
 	QueryInterval     int    `envconfig:"QUERY_INTERVAL",default:"15"`
 
@@ -65,11 +65,15 @@ func Load() *ConfigSpec {
 	err := envconfig.Process("TSD", cfg)
 
 	if err != nil {
-		logger.Fatalf("failed to parse config: %v", err)
+		logrus.Panicf("failed to parse config: %v", err)
 	}
 
 	// set log level
-	logger.SetLevel(logger.LevelFromString(cfg.LogLevel))
+	level, err := logrus.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logrus.Panicf("failed to parse log level, %+v", err)
+	}
+	logrus.SetLevel(level)
 
 	// convert csv values
 	cfg.Backends = ConfigListToArray(cfg.BackendList)

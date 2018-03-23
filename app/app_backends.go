@@ -1,11 +1,11 @@
 package app
 
 import (
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
 	"github.com/davidhiendl/telegraf-docker-sd/app/sdtemplate"
 	"github.com/davidhiendl/telegraf-docker-sd/app/backend/docker"
 	"github.com/davidhiendl/telegraf-docker-sd/app/backend"
 	"github.com/davidhiendl/telegraf-docker-sd/app/backend/kubernetes"
+	"github.com/sirupsen/logrus"
 )
 
 // Load templates from disk. If called multiple times templates are re-loaded
@@ -18,14 +18,14 @@ func (app *App) loadBackends() {
 		}
 
 		// create backend instance
-		logger.Debugf("[%v] creating backend", name)
+		logrus.Debugf("[%v] creating backend", name)
 		b := LoadBackend(name)
 
 		// filter templates by backend
 		templates := make(map[string]*sdtemplate.Template)
 		for tplName, tpl := range app.templates {
 			if tpl.Spec.Backend == b.Name() {
-				logger.Debugf("[%v] adding template: %v", name, tplName)
+				logrus.Debugf("[%v] adding template: %v", name, tplName)
 				templates[tplName] = tpl
 			}
 		}
@@ -52,7 +52,7 @@ func LoadBackend(name string) backend.Backend {
 	case "kubernetes":
 		return kubernetes.NewBackend()
 	default:
-		logger.Fatalf(`unknown backend: "%v"`, name)
+		logrus.Fatalf(`unknown backend: "%v"`, name)
 	}
 
 	return nil

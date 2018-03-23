@@ -1,6 +1,6 @@
-backend: docker
+backend: kubernetes
 template: |
-    {{- if .MatchImage "mysql" }}
+    {{- if .AnnotationEquals "telegraf.sd.tags/application" "mysql" }}
 
     # Read metrics from one or many mysql servers
     [[inputs.mysql]]

@@ -2,7 +2,7 @@ package globalconfig
 
 import (
 	"regexp"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func (gc *GlobalConfigSpec) EnvGet(key string) string {
@@ -31,7 +31,7 @@ func (gc *GlobalConfigSpec) EnvEquals(key string, value string) bool {
 func (gc *GlobalConfigSpec) EnvMatches(key string, pattern string) bool {
 	regex, err := regexp.Compile(pattern)
 	if err != nil {
-		logger.Errorf("failed to compile template regex: %v" + pattern)
+		logrus.Errorf("failed to compile template regex: %v" + pattern)
 	}
 
 	val := gc.EnvOrDefault(key, "")

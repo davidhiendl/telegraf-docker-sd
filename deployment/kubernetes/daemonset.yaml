@@ -1,0 +1,72 @@
+---
+BROKEN_DONT_USE_CRASHES_HOST
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: telegraf-docker-sd
+  namespace: monitoring
+spec:
+  template:
+    metadata:
+      name: telegraf-docker-sd
+      labels:
+        app: telegraf-docker-sd
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - image: dhswt/telegraf-docker-sd
+        name: telegraf-docker-sd
+        env:
+        - name: HOST_PROC
+          value: "/hostfs/proc"
+        - name: HOST_SYS
+          value: "/hostfs/sys"
+        - name: HOST_ETC
+          value: "/hostfs/etc"
+        - name: OUTPUT_INFLUXDB_URL
+          value: "http://your-influx-db"
+        - name: OUTPUT_INFLUXDB_USER
+          value: "telegraf"
+        - name: OUTPUT_INFLUXDB_PASS
+          value: "your-password"
+        - name: TSD_BACKENDS
+          value: "kubernetes"
+        - name: TSD_GLOBAL_TAGS
+          value: "cluster=some-cluster-name,dc-provider=digitalocean,dc-region=ams3"
+        resources:
+          requests:
+            memory: 30Mi
+            cpu: 100m
+          limits:
+            memory: 50Mi
+            cpu: 200m
+        volumeMounts:
+        - name: proc
+          readOnly:  true
+          mountPath: /hostfs/proc
+        - name: sys
+          readOnly: true
+          mountPath: /hostfs/sys
+        - name: etc
+          readOnly: true
+          mountPath: /hostfs/etc
+        - name: docker
+          readOnly: true
+          mountPath: /var/run/docker.sock
+      serviceAccountName: telegraf-docker-sd
+      #securityContext: check if needed
+      #  priviledged: true
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: etc
+        hostPath:
+          path: /etc
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock

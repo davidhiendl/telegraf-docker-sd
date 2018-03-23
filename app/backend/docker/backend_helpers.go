@@ -4,7 +4,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"context"
 	"github.com/docker/docker/client"
-	"github.com/davidhiendl/telegraf-docker-sd/app/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func (backend *DockerBackend) getImageForID(id string) *types.ImageSummary {
@@ -26,7 +26,7 @@ func (backend *DockerBackend) prepareDockerClient() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		logger.Fatalf(LOG_PREFIX+" failed to connect to docker: %+v\n", err)
+		logrus.Fatalf(LOG_PREFIX+" failed to connect to docker: %+v\n", err)
 	}
 
 	// allow selecting API version dynamically
