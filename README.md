@@ -139,3 +139,7 @@ The Telegraf main configuration files can also be generated:
 - GO >= 1.9
 - influxdata/telegraf >= 0.10.1 (re-loading via SIGHUP is required and was implemented at that version)
 - jordansissel/fpm >= 1.9.3 (debian packaging, tested only with 1.9.3, might work with earlier versions)
+
+
+## TODOs
+- ? improve configuration by switching from env-file to custom yaml file that may be specified via --config flag

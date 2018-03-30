@@ -36,9 +36,8 @@ function package-deb {
 
     # prepare paths
     SRC_DIR="./build/deb.d"
-    DST_DIR="./dist/"
-    BIN_SRC="${DST_DIR}/telegraf-docker-sd"
-    DST_PKG="${DST_DIR}/telegraf-docker-sd_${DEB_VERSION}.deb"
+    BIN_SRC="${BINARY_PATH}/${BINARY_NAME}"
+    DST_PKG="${BINARY_PATH}/${BINARY_NAME}_${DEB_VERSION}.deb"
 
     # check if binary exists
     if [ ! -e "${BIN_SRC}" ]; then
@@ -100,12 +99,12 @@ function test-run-kubernetes {
 }
 
 function image {
-    echo "Building telegraf-docker-sd image, this might take a long time..."; \
+    echo "Building ${DOCKER_REPO} image, this might take a long time..."; \
 	docker build --squash -t $DOCKER_REPO:dev .
 }
 
 function push-dev {
-    echo "Pushing telegraf-docker-sd image, this might take a long time..."; \
+    echo "Pushing ${DOCKER_REPO} image, this might take a long time..."; \
 	docker push $DOCKER_REPO:dev
 }
 
@@ -143,6 +142,6 @@ case "$1" in
         ;;
 
     *)
-        echo $"Usage: $0 {build|build-dev|package-dev|glide|image|test-run-docker|test-run-kubernetes}"
+        echo $"Usage: $0 {build|build-dev|package-deb|exec-glide|image|test-run-docker|test-run-kubernetes}"
         exit 1
 esac
