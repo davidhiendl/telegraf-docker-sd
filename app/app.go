@@ -40,7 +40,11 @@ func NewApp(cfg *config.ConfigSpec) (*App) {
 }
 
 func (app *App) Run() {
-	interval := time.Duration(constants.DEFAULT_QUERY_INTERVAL) * time.Second
+	interval := app.config.QueryInterval
+	if interval <= 0 {
+		interval = constants.DEFAULT_QUERY_INTERVAL
+	}
+	dInterval := time.Duration(interval) * time.Second
 
 	app.processGlobalConfig()
 
@@ -50,7 +54,7 @@ func (app *App) Run() {
 			b.Run()
 		}
 		app.telegrafReloader.ReloadIfRequested()
-		time.Sleep(interval)
+		time.Sleep(dInterval)
 	}
 }
 
