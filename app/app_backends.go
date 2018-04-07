@@ -47,9 +47,9 @@ func (app *App) loadBackends() {
 func LoadBackend(name string) backend.Backend {
 
 	switch name {
-	case "docker":
+	case docker.NAME:
 		return docker.NewBackend()
-	case "kubernetes":
+	case kubernetes.NAME:
 		return kubernetes.NewBackend()
 	default:
 		logrus.Fatalf(`unknown backend: "%v"`, name)
