@@ -13,8 +13,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	LOG_PREFIX   = "[reloader]"
+	PROCESS_NAME = "telegraf"
+)
+
 type TelegrafReloader struct {
-	name         string
 	signal       syscall.Signal
 	shouldReload bool
 }
@@ -25,10 +29,6 @@ func NewTelegrafReloader() *TelegrafReloader {
 		signal:       syscall.SIGHUP,
 		shouldReload: false,
 	}
-}
-
-func (tr *TelegrafReloader) Name() string {
-	return tr.name
 }
 
 func (tr *TelegrafReloader) IsReloadRequested() bool {
@@ -45,6 +45,7 @@ func (tr *TelegrafReloader) ReloadIfRequested() {
 	}
 }
 func (tr *TelegrafReloader) Reload() {
+	logrus.Debugf(LOG_PREFIX + " signaling telegraf to reload configuration")
 	tr.dispatchSignal()
 	tr.shouldReload = false
 }
@@ -65,7 +66,7 @@ func (tr *TelegrafReloader) dispatchSignal() {
 			// extract the middle part of the path with the <pid> and convert it into an integer. Log on failure
 			pid, err := strconv.Atoi(path[6:strings.LastIndex(path, "/")])
 			if err != nil {
-				logrus.Debugf("failed to extract pid from path: %v", path)
+				logrus.Debugf(LOG_PREFIX+" failed to extract pid from path: %v", path)
 				return nil
 			}
 
@@ -73,18 +74,18 @@ func (tr *TelegrafReloader) dispatchSignal() {
 			// The line looks like "Name: theProcess", log an error in case we cant read the file.
 			f, err := ioutil.ReadFile(path)
 			if err != nil {
-				logrus.Error("failed to read status file, %+v", err)
+				logrus.Error(LOG_PREFIX+" failed to read status file, %+v", err)
 				return nil
 			}
 
 			// Extract the process name from within the first line in the buffer
 			name := string(f[6:bytes.IndexByte(f, '\n')])
 
-			if name == tr.name {
-				logrus.Debugf("PID: %d, Name: %s will be signaled with %v", pid, name, tr.signal)
+			if name == PROCESS_NAME {
+				logrus.Debugf(LOG_PREFIX+" PID: %d, Name: %s will be signaled with %v", pid, name, tr.signal)
 				proc, err := os.FindProcess(pid)
 				if err != nil {
-					logrus.Errorf("> Failed to signal, err: %v", err)
+					logrus.Errorf(LOG_PREFIX+" > Failed to signal, err: %v", err)
 					log.Println(err)
 				}
 
