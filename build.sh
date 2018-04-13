@@ -121,7 +121,7 @@ case "$1" in
         package-deb "${@:2}"
         ;;
 
-    exec-glide)
+    glide)
         exec-glide "${@:2}"
         ;;
 
@@ -142,6 +142,6 @@ case "$1" in
         ;;
 
     *)
-        echo $"Usage: $0 {build|build-dev|package-deb|exec-glide|image|test-run-docker|test-run-kubernetes}"
+        echo $"Usage: $0 {build|build-dev|package-deb|glide|image|test-run-docker|test-run-kubernetes}"
         exit 1
 esac
