@@ -58,7 +58,7 @@ func (backend *KubernetesBackend) processPodsOnCurrentKubeNode() error {
 			continue
 		}
 
-		// check if IP changed and regenare the configuration accordingly
+		// check if IP changed and generate the configuration accordingly
 		if ok && pod.Status.PodIP != trackedPod.PodIP {
 			// renew tracking if IP changed
 			logrus.Infof(LOG_PREFIX + " tracked pod ip changed, re-configuring")
