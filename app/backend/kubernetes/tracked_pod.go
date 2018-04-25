@@ -12,9 +12,10 @@ type TrackedPod struct {
 	backend    *KubernetesBackend
 	configFile string
 
-	UID  types.UID
-	Name string
-	Pod  *corev1.Pod
+	UID   types.UID
+	Name  string
+	Pod   *corev1.Pod
+	PodIP string
 
 	Config map[string]string
 	Tags   map[string]string
@@ -24,15 +25,25 @@ type TrackedPod struct {
 // Create new config and populate it from environment
 func NewTrackedPod(backend *KubernetesBackend, pod *corev1.Pod) *TrackedPod {
 	tp := TrackedPod{
-		UID:     pod.GetUID(),
-		Name:    pod.Name,
 		backend: backend,
-		Pod:     pod,
-
-		Config: make(map[string]string),
-		Tags:   make(map[string]string),
-		Env:    backend.commonConfig.EnvMap,
+		Env:     backend.commonConfig.EnvMap,
 	}
+
+	tp.importPodData(pod)
+
+	return &tp
+}
+
+func (tp *TrackedPod) importPodData(pod *corev1.Pod) {
+	// extract basic info
+	tp.Pod = pod
+	tp.UID = pod.GetUID()
+	tp.Name = pod.Name
+	tp.PodIP = pod.Status.PodIP
+
+	// init maps
+	tp.Config = make(map[string]string)
+	tp.Tags = make(map[string]string)
 
 	// parse config
 	tp.parseAnnotationsAsConfig()
@@ -47,8 +58,6 @@ func NewTrackedPod(backend *KubernetesBackend, pod *corev1.Pod) *TrackedPod {
 	logrus.Debugf(LOG_PREFIX+"[%v] labels: %+v", tp.Name, tp.Pod.Labels)
 	logrus.Debugf(LOG_PREFIX+"[%v] annotations: %+v", tp.Name, tp.Pod.Annotations)
 	logrus.Debugf(LOG_PREFIX+"[%v] tags: %+v", tp.Name, tp.Tags)
-
-	return &tp
 }
 
 func (tp *TrackedPod) ConfigFile() string {
@@ -65,5 +74,5 @@ func (tp *TrackedPod) ConfigFile() string {
 }
 
 func (tp *TrackedPod) TargetIP() string {
-	return tp.Pod.Status.PodIP
+	return tp.PodIP
 }

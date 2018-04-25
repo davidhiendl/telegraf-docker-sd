@@ -61,7 +61,7 @@ func (backend *KubernetesBackend) Init(spec *backend.BackendConfigSpec) {
 	// find current node
 	node, err := backend.findCurrentKubeNode()
 	if err != nil {
-		logrus.Fatalf(LOG_PREFIX+" failed to find current node: %v", err)
+		logrus.Fatalf(LOG_PREFIX+" %v", err)
 	}
 	backend.node = node
 }
