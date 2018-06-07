@@ -1,3 +1,6 @@
+# Moved to GitLab: https://gitlab.com/davidhiendl/telegraf-docker-sd
+
+
 # Telegraf Docker Service Discovery
 
 `telegraf-docker-sd` is a lightweight (written in GO) companion for the
