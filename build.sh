@@ -93,8 +93,9 @@ function test-run-kubernetes {
 	GLOBAL_TAGS_ABC=some-value-a \
 	GLOBAL_TAGS_DEF=some-value-b \
 	GLOBAL_TAGS_GHI_JKL=some-value-c \
+	TSD_LOG_LEVEL=info \
 	TSD_KUBERNETES_TAG_LABELS_WHITELIST=app,name \
-	TSD_KUBERNETES_NODE_NAME_OVERRIDE=k8s-prod-worker-3 \
+	TSD_KUBERNETES_NODE_NAME_OVERRIDE=k8s-prod-worker-1 \
 	${BINARY_TARGET}
 }
 

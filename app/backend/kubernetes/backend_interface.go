@@ -51,22 +51,20 @@ func (backend *KubernetesBackend) Init(spec *backend.BackendConfigSpec) {
 		logrus.WithFields(logrus.Fields{"key": key, "value": value}).Infof(LOG_PREFIX + " configuration loaded")
 	}
 
-	// create client
-	client, err := backend.createKubeClient()
-	if err != nil {
-		logrus.Fatalf(LOG_PREFIX+" failed to create kubernetes client: %+v", err)
-	}
-	backend.client = client
-
-	// find current node
-	node, err := backend.findCurrentKubeNode()
-	if err != nil {
-		logrus.Fatalf(LOG_PREFIX+" %v", err)
-	}
-	backend.node = node
+	backend.configureClient()
 }
 
 func (backend *KubernetesBackend) Run() {
+	if backend.node == nil {
+		logrus.Infof(LOG_PREFIX + " kubernetes node is not set, attempting to find current node")
+		backend.configureKubeNode()
+
+		// do not attempt to process containers if node was not found
+		if backend.node == nil {
+			return
+		}
+	}
+
 	backend.processPodsOnCurrentKubeNode()
 }
 

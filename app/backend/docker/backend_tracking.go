@@ -41,12 +41,11 @@ func (backend *DockerBackend) processContainers() {
 
 		// if it does not exist anymore then remove the associated config
 		if !found {
-			logrus.Infof(LOG_PREFIX+"[%v] cleanup container no longer existing container", tracked.ShortID)
+			logrus.Infof(LOG_PREFIX+"[%v] cleanup no longer existing container", tracked.ShortID)
 			backend.cleanupContainer(tracked)
 		}
 	}
 }
-
 
 func (backend *DockerBackend) trackContainer(cont *types.Container) {
 
@@ -77,7 +76,12 @@ func (backend *DockerBackend) trackContainer(cont *types.Container) {
 
 	// register tracked container
 	logrus.Infof(LOG_PREFIX+"[%v] started tracking: %+v", toShortID(cont.ID), cont.Names)
-	tracked := NewTrackedContainer(backend, cont)
+	var err error = nil
+	tracked, err := NewTrackedContainer(backend, cont)
+	if err != nil {
+		logrus.Infof(LOG_PREFIX+"[%v] failed to track container: %+v", toShortID(cont.ID), cont.Names)
+		return
+	}
 	backend.trackedContainers[tracked.ID] = tracked
 
 	// process template(s) for container

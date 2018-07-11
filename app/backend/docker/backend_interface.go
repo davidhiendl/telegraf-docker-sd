@@ -53,6 +53,18 @@ func (backend *DockerBackend) Init(spec *backend.BackendConfigSpec) {
 }
 
 func (backend *DockerBackend) Run() {
+
+	// check if client exists and attempt re-connect if necessary
+	if backend.dockerCli == nil {
+		logrus.Errorf(LOG_PREFIX + " docker client not connected, attempting to reconnect")
+		backend.prepareDockerClient()
+
+		if backend.dockerCli == nil {
+			logrus.Errorf(LOG_PREFIX + " failed to reconnect docker client")
+			return
+		}
+	}
+
 	backend.processContainers()
 }
 

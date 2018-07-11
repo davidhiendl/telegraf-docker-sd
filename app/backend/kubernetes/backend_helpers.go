@@ -9,10 +9,45 @@ import (
 	"strconv"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
+	"github.com/sirupsen/logrus"
 )
 
 func (backend *KubernetesBackend) GetRunMode() int {
 	return backend.runMode
+}
+
+func (backend *KubernetesBackend) configureClient() error {
+	// create client
+	client, err := backend.createKubeClient()
+	if err != nil {
+		logrus.Errorf(LOG_PREFIX+" failed to create kubernetes client: %+v", err)
+		return err
+	}
+
+	backend.client = client
+	return nil
+}
+
+func (backend *KubernetesBackend) configureKubeNode() error {
+	if backend.client == nil {
+		logrus.Debugf(LOG_PREFIX + " cannot configure node without client")
+		return errors.New("cannot configure node without client")
+	}
+
+	// find current node
+	node, err := backend.findCurrentKubeNode()
+	if err != nil {
+		logrus.Errorf(LOG_PREFIX+" %v", err)
+		return err
+	}
+
+	backend.node = node
+	return nil
+}
+
+func (backend *KubernetesBackend) resetClient() {
+	backend.client = nil
+	backend.node = nil
 }
 
 func (backend *KubernetesBackend) createKubeClient() (*kubernetes.Clientset, error) {

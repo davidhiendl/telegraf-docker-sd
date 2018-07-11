@@ -25,7 +25,7 @@ type TrackedContainer struct {
 }
 
 // Create new config and populate it from environment
-func NewTrackedContainer(backend *DockerBackend, container *types.Container) *TrackedContainer {
+func NewTrackedContainer(backend *DockerBackend, container *types.Container) (*TrackedContainer, error) {
 	tc := TrackedContainer{
 		backend:   backend,
 		Container: container,
@@ -36,10 +36,15 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 
 		Config: make(map[string]string),
 		Tags:   make(map[string]string),
-		Env: backend.commonConfig.EnvMap,
+		Env:    backend.commonConfig.EnvMap,
 	}
 
-	tc.Image = tc.backend.getImageForID(container.ImageID)
+	var err error = nil
+	tc.Image, err = tc.backend.getImageForID(container.ImageID)
+	if err != nil {
+		logrus.Errorf(LOG_PREFIX+"[%v] failed to lookup image for container, ImageID: %v", tc.ShortID, container.ImageID)
+		return nil, err
+	}
 
 	// add explicit labels
 	tc.parseLabelsAsTags()
@@ -54,7 +59,7 @@ func NewTrackedContainer(backend *DockerBackend, container *types.Container) *Tr
 	logrus.Debugf(LOG_PREFIX+"[%v] config: %+v", tc.ShortID, tc.Config)
 	logrus.Debugf(LOG_PREFIX+"[%v] labels: %+v", tc.ShortID, tc.Container.Labels)
 
-	return &tc
+	return &tc, nil
 }
 
 func (tc *TrackedContainer) dockerNetBridge() *network.EndpointSettings {
