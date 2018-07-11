@@ -12,14 +12,6 @@ the configuration dynamically. This allows for great flexibility and
 the ability to monitor docker containers that are created dynamically by
 orchestration frameworks like Swarm, K8Ns, ...
 
-## 0.3.0-alpha release
-This release is a major refactor and rewrite with the goal to support
-multiple discovery backends (kubernetes is WIP).
-
-Most functions are still supported however the template configuration
-has changed and now uses YAML files to add more structured data with an
-embedded golang template.
-
 ## Example configuration
 By using GO Templates an enormous amount of flexibility can be achieved
 when creating templates. See the full documentations for a list of
@@ -143,3 +135,5 @@ The Telegraf main configuration files can also be generated:
 
 ## TODOs
 - ? improve configuration by switching from env-file to custom yaml file that may be specified via --config flag
+- gracefully handle signals and stop agent
+- use go-routines for each backend instance
